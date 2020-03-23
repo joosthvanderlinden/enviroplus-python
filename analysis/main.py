@@ -6,6 +6,7 @@ import plotly
 import random
 import plotly.graph_objs as go
 from collections import deque
+import time
 
 from bme280 import BME280
 try:
@@ -37,6 +38,7 @@ app.layout = html.Div(
 @app.callback(Output('live-graph', 'figure'),
               [Input('graph-update', 'n_intervals')])
 def update_graph_scatter(input_data):
+	time.sleep(1)
     X.append(X[-1]+1)
     Y.append(bme280.get_temperature())
 
