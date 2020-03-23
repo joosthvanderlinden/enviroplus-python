@@ -8,6 +8,8 @@ import plotly.graph_objs as go
 from collections import deque
 import time
 
+import pandas # fixes import error?
+
 from bme280 import BME280
 try:
 	from smbus2 import SMBus
@@ -38,7 +40,6 @@ app.layout = html.Div(
 @app.callback(Output('live-graph', 'figure'),
 			  [Input('graph-update', 'n_intervals')])
 def update_graph_scatter(input_data):
-	time.sleep(1)
 	X.append(X[-1]+1)
 	Y.append(bme280.get_temperature())
 
