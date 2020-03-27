@@ -113,7 +113,7 @@ def update_graph(X, Y):
 			  [Input('graph-update', 'n_intervals')])
 def update_time(input_data):
 	X.append(X[-1]+1)
-	return 'Most recent update: {}'.format(X)
+	return 'Most recent update: {}'.format(X[-1])
 	
 # Temperature
 @app.callback(Output('graph-temperature', 'figure'),
