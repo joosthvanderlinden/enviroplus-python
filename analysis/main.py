@@ -108,10 +108,11 @@ def update_graph(X, Y):
 												yaxis=dict(range=[min(Y),max(Y)]),)}
 
 # Time axis
-@app.callback(None,
+@app.callback(Output('graph-temperature', 'figure'),
 			  [Input('graph-update', 'n_intervals')])
 def update_time(input_data):
 	X.append(X[-1]+1)
+	return None
 	
 # Temperature
 @app.callback(Output('graph-temperature', 'figure'),
