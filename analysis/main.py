@@ -83,6 +83,7 @@ particulate matter sensor, connected to a [Raspberry Pi](https://www.raspberrypi
 app = dash.Dash(__name__)
 app.layout = html.Div(children=[
 	dcc.Markdown(children=header_text),
+	html.Div(id='counter')
 
 	dcc.Graph(id='graph-temperature', animate=True),
 	dcc.Graph(id='graph-humidity', animate=True),
@@ -108,11 +109,11 @@ def update_graph(X, Y):
 												yaxis=dict(range=[min(Y),max(Y)]),)}
 
 # Time axis
-@app.callback(Output('graph-temperature', 'figure'),
+@app.callback(Output('counter', 'children'),
 			  [Input('graph-update', 'n_intervals')])
 def update_time(input_data):
 	X.append(X[-1]+1)
-	return None
+	return 'Most recent update: {}'.format(X)
 	
 # Temperature
 @app.callback(Output('graph-temperature', 'figure'),
