@@ -83,7 +83,7 @@ particulate matter sensor, connected to a [Raspberry Pi](https://www.raspberrypi
 app = dash.Dash(__name__)
 app.layout = html.Div(children=[
 	dcc.Markdown(children=header_text),
-	html.Div(id='counter')
+	html.Div(id='counter'),
 
 	dcc.Graph(id='graph-temperature', animate=True),
 	dcc.Graph(id='graph-humidity', animate=True),
