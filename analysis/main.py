@@ -137,8 +137,8 @@ def update_graph_temperature(input_data):
 	return update_graph(X, Y_pressure)
 
 # Light
-@app.callback(Output('graph-temperature', 'figure'),
-			  [Input('graph-light', 'n_intervals')])
+@app.callback(Output('graph-light', 'figure'),
+			  [Input('graph-update', 'n_intervals')])
 def update_graph_temperature(input_data):
 	Y_light.append(ltr559.get_lux())
 	return update_graph(X, Y_light)
