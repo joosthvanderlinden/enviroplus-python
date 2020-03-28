@@ -34,7 +34,7 @@ from collections import deque
 import time
 
 # Other imports
-# import pandas as pd
+import pandas as pd # import to fix bug in plotly
 import numpy as np
 
 # --------------------------------------------------------------------------------------------------
