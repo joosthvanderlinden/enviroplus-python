@@ -34,7 +34,8 @@ from collections import deque
 import time
 
 # Other imports
-import pandas
+# import pandas as pd
+import numpy as np
 
 # --------------------------------------------------------------------------------------------------
 # ---------------------------------------------------------------------------- SENSOR INITIALIZATION
@@ -102,11 +103,16 @@ def update_graph(X, Y):
 			x=list(X),
 			y=list(Y),
 			name='Scatter',
-			mode='lines+markers'
+			mode='lines+markers',
+			connectgaps=False
 			)
+	
+	chart = {'data': [data]}
 
-	return {'data': [data],'layout' : go.Layout(xaxis=dict(range=[min(X),max(X)]),
-												yaxis=dict(range=[min(Y),max(Y)]),)}
+	if len(X) > 0:
+		chart['layout'] = go.Layout(xaxis=dict(range=[min(X),max(X)]),
+									yaxis=dict(range=[min(Y),max(Y)]))
+	return chart
 
 # Time axis
 @app.callback(Output('counter', 'children'),
@@ -121,9 +127,9 @@ def update_time(input_data):
 def update_graph_temperature(input_data):
 	try:
 		Y_temperature.append(bme280.get_temperature())
-		return update_graph(X, Y_temperature)
 	except:
-		return update_graph(X, Y_temperature)
+		Y_temperature.append(np.nan)
+	return update_graph(X, Y_temperature)
 
 # Humidity
 @app.callback(Output('graph-humidity', 'figure'),
@@ -131,9 +137,9 @@ def update_graph_temperature(input_data):
 def update_graph_temperature(input_data):
 	try:
 		Y_humidity.append(bme280.get_humidity())
-		return update_graph(X, Y_humidity)
 	except:
-		return update_graph(X, Y_humidity)
+		Y_humidity.append(np.nan)
+	return update_graph(X, Y_humidity)
 
 # Pressure
 @app.callback(Output('graph-pressure', 'figure'),
@@ -141,9 +147,9 @@ def update_graph_temperature(input_data):
 def update_graph_temperature(input_data):
 	try:
 		Y_pressure.append(bme280.get_pressure())
-		return update_graph(X, Y_pressure)
 	except:
-		return update_graph(X, Y_pressure)
+		Y_pressure.append(np.nan)
+	return update_graph(X, Y_pressure)
 
 # Light
 @app.callback(Output('graph-light', 'figure'),
@@ -151,10 +157,9 @@ def update_graph_temperature(input_data):
 def update_graph_temperature(input_data):
 	try:
 		Y_light.append(ltr559.get_lux())
-		return update_graph(X, Y_light)
 	except:
-		return update_graph(X, Y_light)
-
+		Y_light.append(np.nan)
+	return update_graph(X, Y_light)
 
 
 # --------------------------------------------------------------------------------------------------
