@@ -116,7 +116,7 @@ def create_scatter(X,Y):
 
 def update_graph(X, Ys):
 	chart = {'data': [create_scatter(X, Y) for Y in Ys]}
-	if len(Y) > 0:
+	if len(X) > 0:
 		chart['layout'] = go.Layout(xaxis=dict(range=[min(X),
 													  max(X)]),
 									yaxis=dict(range=[min([min([y for y in Y if y is not None]) for Y in Ys]),
