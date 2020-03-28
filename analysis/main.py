@@ -56,19 +56,19 @@ except ImportError:
 # --------------------------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------ DATA INITIALIZATION
 X = deque(maxlen=20)
-X.append(1)
+# X.append(1)
 
 Y_temperature = deque(maxlen=20)
-Y_temperature.append(25)
+# Y_temperature.append(25)
 
 Y_humidity = deque(maxlen=20)
-Y_humidity.append(25)
+# Y_humidity.append(25)
 
 Y_pressure = deque(maxlen=20)
-Y_pressure.append(25)
+# Y_pressure.append(25)
 
 Y_light = deque(maxlen=20)
-Y_light.append(25)
+# Y_light.append(25)
 
 # --------------------------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------------------- LAYOUT
@@ -119,29 +119,42 @@ def update_time(input_data):
 @app.callback(Output('graph-temperature', 'figure'),
 			  [Input('graph-update', 'n_intervals')])
 def update_graph_temperature(input_data):
-	Y_temperature.append(bme280.get_temperature())
-	return update_graph(X, Y_temperature)
+	try:
+		Y_temperature.append(bme280.get_temperature())
+		return update_graph(X, Y_temperature)
+	except:
+		return update_graph(X, Y_temperature)
 
 # Humidity
 @app.callback(Output('graph-humidity', 'figure'),
 			  [Input('graph-update', 'n_intervals')])
 def update_graph_temperature(input_data):
-	Y_humidity.append(bme280.get_humidity())
-	return update_graph(X, Y_humidity)
+	try:
+		Y_humidity.append(bme280.get_humidity())
+		return update_graph(X, Y_humidity)
+	except:
+		return update_graph(X, Y_humidity)
 
 # Pressure
 @app.callback(Output('graph-pressure', 'figure'),
 			  [Input('graph-update', 'n_intervals')])
 def update_graph_temperature(input_data):
-	Y_pressure.append(bme280.get_pressure())
-	return update_graph(X, Y_pressure)
+	try:
+		Y_pressure.append(bme280.get_pressure())
+		return update_graph(X, Y_pressure)
+	except:
+		return update_graph(X, Y_pressure)
 
 # Light
 @app.callback(Output('graph-light', 'figure'),
 			  [Input('graph-update', 'n_intervals')])
 def update_graph_temperature(input_data):
-	Y_light.append(ltr559.get_lux())
-	return update_graph(X, Y_light)
+	try:
+		Y_light.append(ltr559.get_lux())
+		return update_graph(X, Y_light)
+	except:
+		return update_graph(X, Y_light)
+
 
 
 # --------------------------------------------------------------------------------------------------
