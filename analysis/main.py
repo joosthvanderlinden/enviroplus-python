@@ -17,6 +17,9 @@
 #   - Basics: https://dash.plotly.com/getting-started-part-2
 #
 # - Make particulate matter chart optional
+#
+# - Add layout for different lines,
+# 	- Examples: https://plotly.com/python/line-charts/
 
 # --------------------------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------------------ IMPORTS
@@ -113,11 +116,11 @@ def create_scatter(X,Y):
 
 def update_graph(X, Ys):
 	chart = {'data': [create_scatter(X, Y) for Y in Ys]}
-	if len(X) > 0:
+	if len(Y) > 0:
 		chart['layout'] = go.Layout(xaxis=dict(range=[min(X),
 													  max(X)]),
-									yaxis=dict(range=[min([min(Y) for Y in Ys]),
-													  max([max(Y) for Y in Ys])]))
+									yaxis=dict(range=[min([min([y for y in Y if y is not None]) for Y in Ys]),
+													  max([max([y for y in Y if y is not None]) for Y in Ys])]))
 	return chart
 
 # Time axis
