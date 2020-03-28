@@ -104,6 +104,15 @@ app.layout = html.Div(children=[
 ])
 
 # --------------------------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------- UTILITY FUNCTIONS
+def unpack_arrays(Ys):
+	Y_all = []
+	for Y in Ys:
+		for y in Y:
+			if y is not None:
+				Y_all.append(y)
+	return Y_all
+# --------------------------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------------ CHART UPDATES
 def create_scatter(X,Y):
 	return plotly.graph_objs.Scatter(
@@ -116,11 +125,10 @@ def create_scatter(X,Y):
 
 def update_graph(X, Ys):
 	chart = {'data': [create_scatter(X, Y) for Y in Ys]}
-	if len(X) > 0:
-		chart['layout'] = go.Layout(xaxis=dict(range=[min(X),
-													  max(X)]),
-									yaxis=dict(range=[min([min([y for y in Y if y is not None]) for Y in Ys]),
-													  max([max([y for y in Y if y is not None]) for Y in Ys])]))
+	Y_all = unpack_arrays(Ys)
+	if (len(X) > 0) and (len(Y_all) > 0):
+		chart['layout'] = go.Layout(xaxis=dict(range=[min(X),     max(X)]),
+									yaxis=dict(range=[min(Y_all), max(Y_all)]))
 	return chart
 
 # Time axis
