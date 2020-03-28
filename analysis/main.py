@@ -35,7 +35,6 @@ import time
 
 # Other imports
 import pandas as pd # import to fix bug in plotly
-import numpy as np
 
 # --------------------------------------------------------------------------------------------------
 # ---------------------------------------------------------------------------- SENSOR INITIALIZATION
@@ -69,6 +68,10 @@ Y_temperature = deque(maxlen=20)
 Y_humidity    = deque(maxlen=20)
 Y_pressure    = deque(maxlen=20)
 Y_light       = deque(maxlen=20)
+
+
+
+# TODO: fix bug where no chart is shown when there are nan's in Y`
 
 
 
@@ -134,7 +137,7 @@ def update_graph_temperature(input_data):
 	try:
 		Y_temperature.append(bme280.get_temperature())
 	except:
-		Y_temperature.append(np.nan)
+		Y_temperature.append(None)
 	return update_graph(X, [Y_temperature])
 
 # Humidity
@@ -144,7 +147,7 @@ def update_graph_temperature(input_data):
 	try:
 		Y_humidity.append(bme280.get_humidity())
 	except:
-		Y_humidity.append(np.nan)
+		Y_humidity.append(None)
 	return update_graph(X, [Y_humidity])
 
 # Pressure
@@ -154,7 +157,7 @@ def update_graph_temperature(input_data):
 	try:
 		Y_pressure.append(bme280.get_pressure())
 	except:
-		Y_pressure.append(np.nan)
+		Y_pressure.append(None)
 	return update_graph(X, [Y_pressure])
 
 # Light
@@ -164,7 +167,7 @@ def update_graph_temperature(input_data):
 	try:
 		Y_light.append(ltr559.get_lux())
 	except:
-		Y_light.append(np.nan)
+		Y_light.append(None)
 	return update_graph(X, [Y_light])
 
 
