@@ -106,7 +106,7 @@ def update_graph(X, Y):
 			mode='lines+markers',
 			connectgaps=False
 			)
-	
+
 	chart = {'data': [data]}
 
 	if len(X) > 0:
@@ -118,7 +118,10 @@ def update_graph(X, Y):
 @app.callback(Output('counter', 'children'),
 			  [Input('graph-update', 'n_intervals')])
 def update_time(input_data):
-	X.append(X[-1]+1)
+	if len(X) == 0:
+		X.append(1)
+	else:
+		X.append(X[-1]+1)
 	return 'Most recent update: {}'.format(X[-1])
 	
 # Temperature
