@@ -54,22 +54,23 @@ try:
     ltr559 = LTR559()
 except ImportError:
     import ltr559
+
+# MICS6814 gas sensor
+from enviroplus import gas
+
+# PMS5003 particulate matter sensor 
+# from pms5003 import PMS5003, ReadTimeoutError
+
 # --------------------------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------ DATA INITIALIZATION
 X = deque(maxlen=20)
-# X.append(1)
 
 Y_temperature = deque(maxlen=20)
-# Y_temperature.append(25)
+Y_humidity    = deque(maxlen=20)
+Y_pressure    = deque(maxlen=20)
+Y_light       = deque(maxlen=20)
 
-Y_humidity = deque(maxlen=20)
-# Y_humidity.append(25)
 
-Y_pressure = deque(maxlen=20)
-# Y_pressure.append(25)
-
-Y_light = deque(maxlen=20)
-# Y_light.append(25)
 
 # --------------------------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------------------- LAYOUT
@@ -90,7 +91,7 @@ app.layout = html.Div(children=[
 	dcc.Graph(id='graph-humidity', animate=True),
 	dcc.Graph(id='graph-pressure', animate=True),
 	dcc.Graph(id='graph-light', animate=True),
-	# dcc.Graph(id='graph-gasses', animate=True),
+	dcc.Graph(id='graph-gasses', animate=True),
 	# dcc.Graph(id='graph-particulates', animate=True),
 
 	dcc.Interval(id='graph-update', interval=5*1000), # update every 5 seconds
@@ -98,20 +99,22 @@ app.layout = html.Div(children=[
 
 # --------------------------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------------ CHART UPDATES
-def update_graph(X, Y):
-	data = plotly.graph_objs.Scatter(
-			x=list(X),
-			y=list(Y),
-			name='Scatter',
-			mode='lines+markers',
-			connectgaps=False
-			)
+def create_scatter(X,Y):
+	return plotly.graph_objs.Scatter(
+				x           = list(X),
+				y           = list(Y),
+				name        = 'Scatter',
+				mode        = 'lines+markers',
+				connectgaps = False
+				)
 
-	chart = {'data': [data]}
-
+def update_graph(X, Ys):
+	chart = {'data': [create_scatter(X, Y) for Y in Ys]}
 	if len(X) > 0:
-		chart['layout'] = go.Layout(xaxis=dict(range=[min(X),max(X)]),
-									yaxis=dict(range=[min(Y),max(Y)]))
+		chart['layout'] = go.Layout(xaxis=dict(range=[min(X),
+													  max(X)]),
+									yaxis=dict(range=[min([min(Y) for Y in Ys]),
+													  max([max(Y) for Y in Ys])]))
 	return chart
 
 # Time axis
@@ -132,7 +135,7 @@ def update_graph_temperature(input_data):
 		Y_temperature.append(bme280.get_temperature())
 	except:
 		Y_temperature.append(np.nan)
-	return update_graph(X, Y_temperature)
+	return update_graph(X, [Y_temperature])
 
 # Humidity
 @app.callback(Output('graph-humidity', 'figure'),
@@ -142,7 +145,7 @@ def update_graph_temperature(input_data):
 		Y_humidity.append(bme280.get_humidity())
 	except:
 		Y_humidity.append(np.nan)
-	return update_graph(X, Y_humidity)
+	return update_graph(X, [Y_humidity])
 
 # Pressure
 @app.callback(Output('graph-pressure', 'figure'),
@@ -152,7 +155,7 @@ def update_graph_temperature(input_data):
 		Y_pressure.append(bme280.get_pressure())
 	except:
 		Y_pressure.append(np.nan)
-	return update_graph(X, Y_pressure)
+	return update_graph(X, [Y_pressure])
 
 # Light
 @app.callback(Output('graph-light', 'figure'),
@@ -162,7 +165,7 @@ def update_graph_temperature(input_data):
 		Y_light.append(ltr559.get_lux())
 	except:
 		Y_light.append(np.nan)
-	return update_graph(X, Y_light)
+	return update_graph(X, [Y_light])
 
 
 # --------------------------------------------------------------------------------------------------
