@@ -91,7 +91,7 @@ app.layout = html.Div(children=[
 	dcc.Graph(id='graph-humidity', animate=True),
 	dcc.Graph(id='graph-pressure', animate=True),
 	dcc.Graph(id='graph-light', animate=True),
-	dcc.Graph(id='graph-gasses', animate=True),
+	# dcc.Graph(id='graph-gasses', animate=True),
 	# dcc.Graph(id='graph-particulates', animate=True),
 
 	dcc.Interval(id='graph-update', interval=5*1000), # update every 5 seconds
