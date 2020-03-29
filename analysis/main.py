@@ -5,7 +5,7 @@
 #		- Humidity
 #		- Pressure
 #		- Light
-#		- Gasses (OX, RED, NH3)
+#		- Gases (OX, RED, NH3)
 #		- Particulates (>0.3um, >0.5um, >1.0um, >2.5um, >5.0um, >10.0um)
 #
 # - Come up with some interesting numbers to display, perhaps based on experiments?
@@ -13,7 +13,7 @@
 #	
 # - Load all the data in app.callback, as in https://github.com/nophead/EnviroPlusWeb/blob/master/app.py
 # 	- Wrap chart update in seperate function but create a seperate callback for every chart
-#   - Come up with a way to show multiple lines in one chart (for gasses and PMs)
+#   - Come up with a way to show multiple lines in one chart (for gases and PMs)
 #   - Basics: https://dash.plotly.com/getting-started-part-2
 #
 # - Make particulate matter chart optional
@@ -61,22 +61,26 @@ except ImportError:
 from enviroplus import gas
 
 # PMS5003 particulate matter sensor 
-# from pms5003 import PMS5003, ReadTimeoutError
+from pms5003 import PMS5003, ReadTimeoutError
+pms5003 = PMS5003()
+time.sleep(5.0)
 
 # --------------------------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------ DATA INITIALIZATION
-X = deque(maxlen=20)
-
+X             = deque(maxlen=20)
 Y_temperature = deque(maxlen=20)
 Y_humidity    = deque(maxlen=20)
 Y_pressure    = deque(maxlen=20)
 Y_light       = deque(maxlen=20)
-
-
-
-# TODO: fix bug where no chart is shown when there are nan's in Y`
-
-
+Y_gas_oxi     = deque(maxlen=20)
+Y_gas_red     = deque(maxlen=20)
+Y_gas_nh3     = deque(maxlen=20)
+Y_pm_03       = deque(maxlen=20)
+Y_pm_05       = deque(maxlen=20)
+Y_pm_10       = deque(maxlen=20)
+Y_pm_25       = deque(maxlen=20)
+Y_pm_50       = deque(maxlen=20)
+Y_pm_100      = deque(maxlen=20)
 
 # --------------------------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------------------- LAYOUT
@@ -97,8 +101,8 @@ app.layout = html.Div(children=[
 	dcc.Graph(id='graph-humidity', animate=True),
 	dcc.Graph(id='graph-pressure', animate=True),
 	dcc.Graph(id='graph-light', animate=True),
-	# dcc.Graph(id='graph-gasses', animate=True),
-	# dcc.Graph(id='graph-particulates', animate=True),
+	dcc.Graph(id='graph-gases', animate=True),
+	dcc.Graph(id='graph-particulates', animate=True),
 
 	dcc.Interval(id='graph-update', interval=5*1000), # update every 5 seconds
 ])
@@ -112,6 +116,7 @@ def unpack_arrays(Ys):
 			if y is not None:
 				Y_all.append(y)
 	return Y_all
+
 # --------------------------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------------ CHART UPDATES
 def create_scatter(X,Y):
@@ -181,6 +186,47 @@ def update_graph_temperature(input_data):
 		Y_light.append(None)
 	return update_graph(X, [Y_light])
 
+# Gases
+@app.callback(Output('graph-gases', 'figure'),
+			  [Input('graph-update', 'n_intervals')])
+def update_graph_gases(input_data):
+	try:
+		gases = gas.read_all()
+		Y_gas_oxi.append(gases.oxidising / 1000)
+		Y_gas_red.append(gases.reducing / 1000)
+		Y_gas_nh3.append(gases.nh3 / 1000)
+	except:
+		Y_gas_oxi.append(None)
+		Y_gas_red.append(None)
+		Y_gas_nh3.append(None)
+	return update_graph(X, [Y_gas_oxi, Y_gas_red, Y_gas_nh3])
+
+# Particulate matter
+@app.callback(Output('graph-particulates', 'figure'),
+			  [Input('graph-update', 'n_intervals')])
+def update_graph_particulates(input_data):
+	try:
+		particles = pms5003.read()
+		pm100 = particles.pm_per_1l_air(10.0)
+		pm50  = particles.pm_per_1l_air(5.0) - pm100
+		pm25  = particles.pm_per_1l_air(2.5) - pm100 - pm50
+		pm10  = particles.pm_per_1l_air(1.0) - pm100 - pm50 - pm25
+		pm5   = particles.pm_per_1l_air(0.5) - pm100 - pm50 - pm25 - pm10
+		pm3   = particles.pm_per_1l_air(0.3) - pm100 - pm50 - pm25 - pm10 - pm5
+		Y_pm_03.append(pm3)
+		Y_pm_05.append(pm5)
+		Y_pm_10.append(pm10)
+		Y_pm_25.append(pm25)
+		Y_pm_50.append(pm50)
+		Y_pm_100.append(pm100)
+	except:
+		Y_pm_03.append(None)
+		Y_pm_05.append(None)
+		Y_pm_10.append(None)
+		Y_pm_25.append(None)
+		Y_pm_50.append(None)
+		Y_pm_100.append(None)
+	return update_graph(X, [Y_pm_03, Y_pm_05, Y_pm_10, Y_pm_25, Y_pm_50, Y_pm_100])
 
 # --------------------------------------------------------------------------------------------------
 # --------------------------------------------------------------------------------------- APP LAUNCH
