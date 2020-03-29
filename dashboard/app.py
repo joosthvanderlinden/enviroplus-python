@@ -68,19 +68,19 @@ time.sleep(5.0)
 # --------------------------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------ DATA INITIALIZATION
 X             = deque(maxlen=20)
-Y_temperature = deque(maxlen=20)
-Y_humidity    = deque(maxlen=20)
-Y_pressure    = deque(maxlen=20)
-Y_light       = deque(maxlen=20)
-Y_gas_oxi     = deque(maxlen=20)
-Y_gas_red     = deque(maxlen=20)
-Y_gas_nh3     = deque(maxlen=20)
-Y_pm_03       = deque(maxlen=20)
-Y_pm_05       = deque(maxlen=20)
-Y_pm_10       = deque(maxlen=20)
-Y_pm_25       = deque(maxlen=20)
-Y_pm_50       = deque(maxlen=20)
-Y_pm_100      = deque(maxlen=20)
+Y_temperature = ('Temperature', deque(maxlen=20))
+Y_humidity    = ('Humidity', deque(maxlen=20))
+Y_pressure    = ('Pressure', deque(maxlen=20))
+Y_light       = ('Light', deque(maxlen=20))
+Y_gas_oxi     = ('Oxidising', deque(maxlen=20))
+Y_gas_red     = ('Reducing', deque(maxlen=20))
+Y_gas_nh3     = ('NH3', deque(maxlen=20))
+Y_pm_03       = ('>0.3um', deque(maxlen=20))
+Y_pm_05       = ('>0.5um', deque(maxlen=20))
+Y_pm_10       = ('>1.0um', deque(maxlen=20))
+Y_pm_25       = ('>2.5um', deque(maxlen=20))
+Y_pm_50       = ('>5.0um', deque(maxlen=20))
+Y_pm_100      = ('>10.0um', deque(maxlen=20))
 
 # --------------------------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------------------- LAYOUT
@@ -97,6 +97,74 @@ app.layout = html.Div(children=[
 	dcc.Markdown(children=header_text),
 	html.Div(id='counter'),
 
+	html.Div([
+		html.Div(
+            [html.H6(id="number-temperature-text"), html.P("Temperature")],
+            id="number-temperature",
+            className="mini-container",
+        ),
+        html.Div(
+            [html.H6(id="number-humidity-text"), html.P("Humidity")],
+            id="number-humidity",
+            className="mini-container",
+        ),
+        html.Div(
+            [html.H6(id="number-pressure-text"), html.P("Pressure")],
+            id="number-pressure",
+            className="mini-container",
+        ),
+        html.Div(
+            [html.H6(id="number-light-text"), html.P("Light")],
+            id="number-light",
+            className="mini-container",
+        ),
+        html.Div(
+            [html.H6(id="number-oxi-text"), html.P("Oxidising")],
+            id="number-oxi",
+            className="mini-container",
+        ),
+        html.Div(
+            [html.H6(id="number-red-text"), html.P("Reducing")],
+            id="number-red",
+            className="mini-container",
+        ),
+        html.Div(
+            [html.H6(id="number-nh3-text"), html.P("NH3")],
+            id="number-nh3",
+            className="mini-container",
+        ),
+        html.Div(
+            [html.H6(id="number-pm03-text"), html.P(">0.3um")],
+            id="number-pm03",
+            className="mini-container",
+        ),
+        html.Div(
+            [html.H6(id="number-pm05-text"), html.P(">0.5um")],
+            id="number-pm05",
+            className="mini-container",
+        ),
+        html.Div(
+            [html.H6(id="number-pm10-text"), html.P(">1.0um")],
+            id="number-pm10",
+            className="mini-container",
+        ),
+        html.Div(
+            [html.H6(id="number-pm25-text"), html.P(">2.5um")],
+            id="number-pm25",
+            className="mini-container",
+        ),
+        html.Div(
+            [html.H6(id="number-pm50-text"), html.P(">5.0um")],
+            id="number-pm50",
+            className="mini-container",
+        ),
+        html.Div(
+            [html.H6(id="number-pm100-text"), html.P(">10.0um")],
+            id="number-pm100",
+            className="mini-container",
+        ),
+    ], id="number-header", className="row container-display"),
+
 	dcc.Graph(id='graph-temperature', animate=True),
 	dcc.Graph(id='graph-humidity', animate=True),
 	dcc.Graph(id='graph-pressure', animate=True),
@@ -112,18 +180,18 @@ app.layout = html.Div(children=[
 def unpack_arrays(Ys):
 	Y_all = []
 	for Y in Ys:
-		for y in Y:
+		for y in Y[1]:
 			if y is not None:
 				Y_all.append(y)
 	return Y_all
 
 # --------------------------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------------ CHART UPDATES
-def create_scatter(X,Y):
+def create_scatter(X, Y):
 	return plotly.graph_objs.Scatter(
 				x           = list(X),
-				y           = list(Y),
-				name        = 'Scatter',
+				y           = list(Y[1]),
+				name        = Y[0],
 				mode        = 'lines+markers',
 				connectgaps = False
 				)
@@ -147,62 +215,82 @@ def update_time(input_data):
 	return 'Most recent update: {}'.format(X[-1])
 	
 # Temperature
-@app.callback(Output('graph-temperature', 'figure'),
+@app.callback([Output('graph-temperature', 'figure'),
+	 		   Output('number-temperature-text', 'children')],
 			  [Input('graph-update', 'n_intervals')])
 def update_graph_temperature(input_data):
 	try:
-		Y_temperature.append(bme280.get_temperature())
+		value = bme280.get_temperature()
 	except:
-		Y_temperature.append(None)
-	return update_graph(X, [Y_temperature])
+		value = None
+	Y_temperature[1].append(value)
+	return (update_graph(X, [Y_temperature]), value)
 
 # Humidity
-@app.callback(Output('graph-humidity', 'figure'),
+@app.callback([Output('graph-humidity', 'figure'),
+	 		   Output('number-humidity-text', 'children')],
 			  [Input('graph-update', 'n_intervals')])
 def update_graph_temperature(input_data):
 	try:
-		Y_humidity.append(bme280.get_humidity())
+		value = bme280.get_humidity()
 	except:
-		Y_humidity.append(None)
-	return update_graph(X, [Y_humidity])
+		value = None
+	Y_humidity[1].append(value)
+	return (update_graph(X, [Y_humidity]), value)
 
 # Pressure
-@app.callback(Output('graph-pressure', 'figure'),
+@app.callback([Output('graph-pressure', 'figure'),
+	 		   Output('number-pressure-text', 'children')],
 			  [Input('graph-update', 'n_intervals')])
 def update_graph_temperature(input_data):
 	try:
-		Y_pressure.append(bme280.get_pressure())
+		value = bme280.get_pressure()
 	except:
-		Y_pressure.append(None)
-	return update_graph(X, [Y_pressure])
+		value = None
+	Y_pressure[1].append(value)
+	return (update_graph(X, [Y_pressure]), value)
 
 # Light
-@app.callback(Output('graph-light', 'figure'),
+@app.callback([Output('graph-light', 'figure'),
+	 		   Output('number-light-text', 'children')],
 			  [Input('graph-update', 'n_intervals')])
 def update_graph_temperature(input_data):
 	try:
-		Y_light.append(ltr559.get_lux())
+		value = ltr559.get_lux()
 	except:
-		Y_light.append(None)
-	return update_graph(X, [Y_light])
+		value = None
+	Y_light[1].append(value)
+	return (update_graph(X, [Y_light]), value)
 
 # Gases
-@app.callback(Output('graph-gases', 'figure'),
+@app.callback([Output('graph-gases', 'figure'),
+	 		   Output('number-oxi-text', 'children'),
+	 		   Output('number-red-text', 'children'),
+	 		   Output('number-nh3-text', 'children')],
 			  [Input('graph-update', 'n_intervals')])
 def update_graph_gases(input_data):
 	try:
 		gases = gas.read_all()
-		Y_gas_oxi.append(gases.oxidising / 1000)
-		Y_gas_red.append(gases.reducing / 1000)
-		Y_gas_nh3.append(gases.nh3 / 1000)
+		value_oxi = gases.oxidising / 1000
+		value_red = gases.reducing / 1000
+		value_nh3 = gases.nh3 / 1000
 	except:
-		Y_gas_oxi.append(None)
-		Y_gas_red.append(None)
-		Y_gas_nh3.append(None)
-	return update_graph(X, [Y_gas_oxi, Y_gas_red, Y_gas_nh3])
+		value_oxi = None
+		value_red = None
+		value_nh3 = None
+	Y_gas_oxi[1].append(value_oxi)
+	Y_gas_red[1].append(value_red)
+	Y_gas_nh3[1].append(value_nh3)
+	return (update_graph(X, [Y_gas_oxi, Y_gas_red, Y_gas_nh3]), value_oxi, value_red, value_nh3)
 
 # Particulate matter
-@app.callback(Output('graph-particulates', 'figure'),
+@app.callback([Output('graph-particulates', 'figure'),
+	 		   Output('number-pm03-text', 'children'),
+	 		   Output('number-pm05-text', 'children'),
+	 		   Output('number-pm10-text', 'children'),
+	 		   Output('number-pm25-text', 'children'),
+	 		   Output('number-pm50-text', 'children'),
+	 		   Output('number-pm100-text', 'children')],
 			  [Input('graph-update', 'n_intervals')])
 def update_graph_particulates(input_data):
 	try:
@@ -213,20 +301,21 @@ def update_graph_particulates(input_data):
 		pm10  = particles.pm_per_1l_air(1.0) - pm100 - pm50 - pm25
 		pm5   = particles.pm_per_1l_air(0.5) - pm100 - pm50 - pm25 - pm10
 		pm3   = particles.pm_per_1l_air(0.3) - pm100 - pm50 - pm25 - pm10 - pm5
-		Y_pm_03.append(pm3)
-		Y_pm_05.append(pm5)
-		Y_pm_10.append(pm10)
-		Y_pm_25.append(pm25)
-		Y_pm_50.append(pm50)
-		Y_pm_100.append(pm100)
 	except:
-		Y_pm_03.append(None)
-		Y_pm_05.append(None)
-		Y_pm_10.append(None)
-		Y_pm_25.append(None)
-		Y_pm_50.append(None)
-		Y_pm_100.append(None)
-	return update_graph(X, [Y_pm_03, Y_pm_05, Y_pm_10, Y_pm_25, Y_pm_50, Y_pm_100])
+		pm100 = None
+		pm50  = None
+		pm25  = None
+		pm10  = None
+		pm5   = None
+		pm3   = None
+	Y_pm_03[1].append(pm3)
+	Y_pm_05[1].append(pm5)
+	Y_pm_10[1].append(pm10)
+	Y_pm_25[1].append(pm25)
+	Y_pm_50[1].append(pm50)
+	Y_pm_100[1].append(pm100)
+	return (update_graph(X, [Y_pm_03, Y_pm_05, Y_pm_10, Y_pm_25, Y_pm_50, Y_pm_100]),
+		    pm3, pm5, pm10, pm25, pm50, pm100)
 
 # --------------------------------------------------------------------------------------------------
 # --------------------------------------------------------------------------------------- APP LAUNCH
