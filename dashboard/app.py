@@ -112,67 +112,67 @@ app.layout = html.Div(children=[
 		html.Div(
             [html.H6(id="number-temperature-text"), html.P("Temperature")],
             id="number-temperature",
-            className="mini-container",
+            className="number_container",
         ),
         html.Div(
             [html.H6(id="number-humidity-text"), html.P("Humidity")],
             id="number-humidity",
-            className="mini-container",
+            className="number_container",
         ),
         html.Div(
             [html.H6(id="number-pressure-text"), html.P("Pressure")],
             id="number-pressure",
-            className="mini-container",
+            className="number_container",
         ),
         html.Div(
             [html.H6(id="number-light-text"), html.P("Light")],
             id="number-light",
-            className="mini-container",
+            className="number_container",
         ),
         html.Div(
             [html.H6(id="number-oxi-text"), html.P("Oxidising")],
             id="number-oxi",
-            className="mini-container",
+            className="number_container",
         ),
         html.Div(
             [html.H6(id="number-red-text"), html.P("Reducing")],
             id="number-red",
-            className="mini-container",
+            className="number_container",
         ),
         html.Div(
             [html.H6(id="number-nh3-text"), html.P("NH3")],
             id="number-nh3",
-            className="mini-container",
+            className="number_container",
         ),
         html.Div(
             [html.H6(id="number-pm03-text"), html.P(">0.3um")],
             id="number-pm03",
-            className="mini-container",
+            className="number_container",
         ),
         html.Div(
             [html.H6(id="number-pm05-text"), html.P(">0.5um")],
             id="number-pm05",
-            className="mini-container",
+            className="number_container",
         ),
         html.Div(
             [html.H6(id="number-pm10-text"), html.P(">1.0um")],
             id="number-pm10",
-            className="mini-container",
+            className="number_container",
         ),
         html.Div(
             [html.H6(id="number-pm25-text"), html.P(">2.5um")],
             id="number-pm25",
-            className="mini-container",
+            className="number_container",
         ),
         html.Div(
             [html.H6(id="number-pm50-text"), html.P(">5.0um")],
             id="number-pm50",
-            className="mini-container",
+            className="number_container",
         ),
         html.Div(
             [html.H6(id="number-pm100-text"), html.P(">10.0um")],
             id="number-pm100",
-            className="mini-container",
+            className="number_container",
         )], 
     	id="number-header", 
     	className="row container-display"
@@ -181,11 +181,11 @@ app.layout = html.Div(children=[
     html.Div([
 	    html.Div(
 	        [dcc.Graph(id='graph-temperature', animate=True)],
-	        className="pretty_container six columns",
+	        className="chart_container six columns",
 	    ),
 	    html.Div(
 	        [dcc.Graph(id='graph-humidity', animate=True)],
-	        className="pretty_container six columns",
+	        className="chart_container six columns",
 	    )],
 		className="row flex-display",
     ),
@@ -193,11 +193,11 @@ app.layout = html.Div(children=[
     html.Div([
 	    html.Div(
 	        [dcc.Graph(id='graph-pressure', animate=True)],
-	        className="pretty_container six columns",
+	        className="chart_container six columns",
 	    ),
 	    html.Div(
 	        [dcc.Graph(id='graph-light', animate=True)],
-	        className="pretty_container six columns",
+	        className="chart_container six columns",
 	    )],
 		className="row flex-display",
     ),
@@ -205,11 +205,11 @@ app.layout = html.Div(children=[
     html.Div([
 	    html.Div(
 	        [dcc.Graph(id='graph-gases', animate=True)],
-	        className="pretty_container six columns",
+	        className="chart_container six columns",
 	    ),
 	    html.Div(
 	        [dcc.Graph(id='graph-particulates', animate=True)],
-	        className="pretty_container six columns",
+	        className="chart_container six columns",
 	    )],
 		className="row flex-display",
     ),

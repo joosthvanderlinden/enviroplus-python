@@ -17,16 +17,16 @@ body {
   margin-left: 0.5%;
 }
 
-.pretty_container {
-  border-radius: 5px;
+.chart_container {
+  border-radius: 2px;
   background-color: #f9f9f9;
-  margin: 10px;
-  padding: 15px;
+  margin: 0px;
+  padding: 5px;
   position: relative;
   box-shadow: 2px 2px 2px lightgrey;
 }
 
-.mini_container {
+.number_container {
   border-radius: 5px;
   background-color: #f9f9f9;
   margin: 10px;
