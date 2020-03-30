@@ -231,8 +231,7 @@ def unpack_arrays(Ys):
 def round_values(Ys):
 	values = []
 	for Y in Ys:
-		v = Y[-1]
-		print(v)
+		v = Y[1][-1]
 		if v is None:
 			values.append('')
 		else:
