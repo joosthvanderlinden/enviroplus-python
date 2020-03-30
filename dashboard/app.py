@@ -76,19 +76,32 @@ time.sleep(5.0)
 # --------------------------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------ DATA INITIALIZATION
 X             = deque(maxlen=20)
-Y_temperature = ('Temperature', deque(maxlen=20))
-Y_humidity    = ('Humidity', deque(maxlen=20))
-Y_pressure    = ('Pressure', deque(maxlen=20))
-Y_light       = ('Light', deque(maxlen=20))
-Y_gas_oxi     = ('Oxidising', deque(maxlen=20))
-Y_gas_red     = ('Reducing', deque(maxlen=20))
-Y_gas_nh3     = ('NH3', deque(maxlen=20))
-Y_pm_03       = ('>0.3um', deque(maxlen=20))
-Y_pm_05       = ('>0.5um', deque(maxlen=20))
-Y_pm_10       = ('>1.0um', deque(maxlen=20))
-Y_pm_25       = ('>2.5um', deque(maxlen=20))
-Y_pm_50       = ('>5.0um', deque(maxlen=20))
-Y_pm_100      = ('>10.0um', deque(maxlen=20))
+
+Y_temperature = {'title': 'Temperature',
+				 'units': 'C',
+				 'values': {'Temperature': deque(maxlen=20)}}
+Y_humidity    = {'title': 'Humidity',
+				 'units': '%',
+				 'values': {'Humidity':    deque(maxlen=20)}}
+Y_pressure    = {'title': 'Pressure',
+				 'units': 'mBar',
+				 'values': {'Pressure':    deque(maxlen=20)}}
+Y_light       = {'title': 'Light',
+				 'units': 'Lux',
+				 'values': {'Light':       deque(maxlen=20)}}
+Y_gas         = {'title': 'Gases',
+				 'units': 'kΩ',
+				 'values': {'Oxidising':   deque(maxlen=20),
+				 			'Reducing':    deque(maxlen=20),
+				 			'NH3':         deque(maxlen=20)}}
+Y_pms         = {'title': 'Particulate matters',
+				 'units': '/100cl',
+				 'values': {'>0.3um':      deque(maxlen=20)
+							'>0.5um':      deque(maxlen=20)
+							'>1.0um':      deque(maxlen=20)
+							'>2.5um':      deque(maxlen=20)
+							'>5.0um':      deque(maxlen=20)
+							'>10.0um':     deque(maxlen=20)}}
 
 # --------------------------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------------------- LAYOUT
@@ -220,42 +233,44 @@ app.layout = html.Div(children=[
 
 # --------------------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------- UTILITY FUNCTIONS
-def unpack_arrays(Ys):
+def unpack_values(Y):
 	Y_all = []
-	for Y in Ys:
-		for y in Y[1]:
+	for name, values in Y['values'].items():
+		for y in values:
 			if y is not None:
 				Y_all.append(y)
 	return Y_all
 
-def round_values(Ys):
-	values = []
-	for Y in Ys:
-		v = Y[1][-1]
+def round_values(Y):
+	rounded = []
+	for name, values in Y['values'].items():
+		v = values[-1]
 		if v is None:
-			values.append('')
+			rounded.append('')
 		else:
-			values.append(round(v, 1))
-	return tuple(values)
+			rounded.append(round(v, 1))
+	return tuple(rounded)
 
 # --------------------------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------------ CHART UPDATES
-def create_scatter(X, Y):
+def create_scatter(X, name, values):
 	return plotly.graph_objs.Scatter(
 				x           = list(X),
-				y           = list(Y[1]),
-				name        = Y[0],
+				y           = list(values),
+				name        = name,
 				mode        = 'lines+markers',
 				connectgaps = False
 				)
 
-def update_graph(X, Ys):
-	chart = {'data': [create_scatter(X, Y) for Y in Ys]}
-	Y_all = unpack_arrays(Ys)
+def update_graph(X, Y):
+	chart = {'data': [create_scatter(X, name, values) for name, values in Y['values'].items()]}
+	Y_all = unpack_values(Y)
 	if (len(X) > 0) and (len(Y_all) > 0):
-		chart['layout'] = go.Layout(xaxis=dict(range=[min(X),     max(X)]),
+		chart['layout'] = go.Layout(title=Y['title'],
+									yaxis_title=Y['units'],
+									xaxis=dict(range=[min(X),     max(X)]),
 									yaxis=dict(range=[min(Y_all), max(Y_all)]))
-	return (chart,) + round_values(Ys) # (chart,) creates single-item tuple
+	return (chart,) + round_values(Y) # (chart,) creates single-item tuple
 
 # Time axis
 @app.callback(Output('counter', 'children'),
@@ -276,8 +291,8 @@ def update_graph_temperature(input_data):
 		value = bme280.get_temperature()
 	except:
 		value = None
-	Y_temperature[1].append(value)
-	return update_graph(X, [Y_temperature])
+	Y_temperature['values']['Temperature'].append(value)
+	return update_graph(X, Y_temperature)
 
 # Humidity
 @app.callback([Output('graph-humidity', 'figure'),
@@ -288,8 +303,8 @@ def update_graph_temperature(input_data):
 		value = bme280.get_humidity()
 	except:
 		value = None
-	Y_humidity[1].append(value)
-	return update_graph(X, [Y_humidity])
+	Y_humidity['values']['Humidity'].append(value)
+	return update_graph(X, Y_humidity)
 
 # Pressure
 @app.callback([Output('graph-pressure', 'figure'),
@@ -300,8 +315,8 @@ def update_graph_temperature(input_data):
 		value = bme280.get_pressure()
 	except:
 		value = None
-	Y_pressure[1].append(value)
-	return update_graph(X, [Y_pressure])
+	Y_pressure['values']['Pressure'].append(value)
+	return update_graph(X, Y_pressure)
 
 # Light
 @app.callback([Output('graph-light', 'figure'),
@@ -312,8 +327,8 @@ def update_graph_temperature(input_data):
 		value = ltr559.get_lux()
 	except:
 		value = None
-	Y_light[1].append(value)
-	return update_graph(X, [Y_light])
+	Y_light['values']['Light'].append(value)
+	return update_graph(X, Y_light)
 
 # Gases
 @app.callback([Output('graph-gases', 'figure'),
@@ -331,10 +346,10 @@ def update_graph_gases(input_data):
 		value_oxi = None
 		value_red = None
 		value_nh3 = None
-	Y_gas_oxi[1].append(value_oxi)
-	Y_gas_red[1].append(value_red)
-	Y_gas_nh3[1].append(value_nh3)
-	return update_graph(X, [Y_gas_oxi, Y_gas_red, Y_gas_nh3])
+	Y_gas['values']['Oxidising'].append(value_oxi)
+	Y_gas['values']['Reducing'].append(value_red)
+	Y_gas['values']['NH3'].append(value_nh3)
+	return update_graph(X, Y_gas)
 
 # Particulate matter
 @app.callback([Output('graph-particulates', 'figure'),
@@ -361,13 +376,13 @@ def update_graph_particulates(input_data):
 		pm10  = None
 		pm5   = None
 		pm3   = None
-	Y_pm_03[1].append(pm3)
-	Y_pm_05[1].append(pm5)
-	Y_pm_10[1].append(pm10)
-	Y_pm_25[1].append(pm25)
-	Y_pm_50[1].append(pm50)
-	Y_pm_100[1].append(pm100)
-	return update_graph(X, [Y_pm_03, Y_pm_05, Y_pm_10, Y_pm_25, Y_pm_50, Y_pm_100])
+	Y_pms['values']['>0.3um'].append(pm3)
+	Y_pms['values']['>0.5um'].append(pm5)
+	Y_pms['values']['>1.0um'].append(pm10)
+	Y_pms['values']['>2.5um'].append(pm25)
+	Y_pms['values']['>5.0um'].append(pm50)
+	Y_pms['values']['>10.0um'].append(pm100)
+	return update_graph(X, Y_pm)
 
 # --------------------------------------------------------------------------------------------------
 # --------------------------------------------------------------------------------------- APP LAUNCH
