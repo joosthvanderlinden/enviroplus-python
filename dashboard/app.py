@@ -96,11 +96,11 @@ Y_gas         = {'title': 'Gases',
 				 			'NH3':         deque(maxlen=20)}}
 Y_pms         = {'title': 'Particulate matters',
 				 'units': '/100cl',
-				 'values': {'>0.3um':      deque(maxlen=20)
-							'>0.5um':      deque(maxlen=20)
-							'>1.0um':      deque(maxlen=20)
-							'>2.5um':      deque(maxlen=20)
-							'>5.0um':      deque(maxlen=20)
+				 'values': {'>0.3um':      deque(maxlen=20),
+							'>0.5um':      deque(maxlen=20),
+							'>1.0um':      deque(maxlen=20),
+							'>2.5um':      deque(maxlen=20),
+							'>5.0um':      deque(maxlen=20),
 							'>10.0um':     deque(maxlen=20)}}
 
 # --------------------------------------------------------------------------------------------------
