@@ -232,11 +232,11 @@ def round_values(Ys):
 	values = []
 	for Y in Ys:
 		v = Y[-1]
+		print(v)
 		if v is None:
 			values.append('')
 		else:
-			values.append(v)
-	print(tuple(values))
+			values.append(round(v, 1))
 	return tuple(values)
 
 # --------------------------------------------------------------------------------------------------
