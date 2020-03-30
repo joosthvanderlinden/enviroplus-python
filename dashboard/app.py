@@ -382,7 +382,7 @@ def update_graph_particulates(input_data):
 	Y_pms['values']['>2.5um'].append(pm25)
 	Y_pms['values']['>5.0um'].append(pm50)
 	Y_pms['values']['>10.0um'].append(pm100)
-	return update_graph(X, Y_pm)
+	return update_graph(X, Y_pms)
 
 # --------------------------------------------------------------------------------------------------
 # --------------------------------------------------------------------------------------- APP LAUNCH
