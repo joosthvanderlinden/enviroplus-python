@@ -255,7 +255,7 @@ def update_graph(X, Ys):
 	if (len(X) > 0) and (len(Y_all) > 0):
 		chart['layout'] = go.Layout(xaxis=dict(range=[min(X),     max(X)]),
 									yaxis=dict(range=[min(Y_all), max(Y_all)]))
-	return (chart) + round_values(Ys)
+	return tuple(chart) + round_values(Ys)
 
 # Time axis
 @app.callback(Output('counter', 'children'),
