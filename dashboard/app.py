@@ -10,6 +10,7 @@
 #
 # - Come up with some interesting numbers to display, perhaps based on experiments?
 #	- Inspiration: https://dash-gallery.plotly.host/Portal/
+#   - Main example: https://github.com/plotly/dash-sample-apps/tree/master/apps/dash-oil-and-gas
 #	
 # - Load all the data in app.callback, as in https://github.com/nophead/EnviroPlusWeb/blob/master/app.py
 # 	- Wrap chart update in seperate function but create a seperate callback for every chart
@@ -38,6 +39,13 @@ import time
 
 # Other imports
 import pandas as pd # import to fix bug in plotly
+
+# --------------------------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------- APP INITIALIZATION
+app = dash.Dash(
+	__name__,
+	meta_tags=[{"name": "viewport", "content": "width=device-width"}]
+	)
 
 # --------------------------------------------------------------------------------------------------
 # ---------------------------------------------------------------------------- SENSOR INITIALIZATION
@@ -84,19 +92,22 @@ Y_pm_100      = ('>10.0um', deque(maxlen=20))
 
 # --------------------------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------------------- LAYOUT
-header_text = '''
-## Air Quality Dashboard
-A [plotly dash](https://dash.plotly.com/) for the output of the 
-[Enviro+](https://shop.pimoroni.com/products/enviro?variant=31155658457171) air quality sensor 
-board and [PMS5003](https://shop.pimoroni.com/products/pms5003-particulate-matter-sensor-with-cable) 
-particulate matter sensor, connected to a [Raspberry Pi](https://www.raspberrypi.org/).
-'''
-
-app = dash.Dash(__name__)
 app.layout = html.Div(children=[
-	dcc.Markdown(children=header_text),
-	html.Div(id='counter'),
+	html.Div([
+	    html.Div([
+            html.H3(
+                "Air Quality Dashboard",
+                style={"margin-bottom": "0px"},
+            )],
+	        className="one-half column",
+	        id="title",
+	    )], 
+	    id="header",
+		className="row flex-display",
+		style={"margin-bottom": "25px"},
+    ),
 
+	html.Div(id='counter'),
 	html.Div([
 		html.Div(
             [html.H6(id="number-temperature-text"), html.P("Temperature")],
@@ -162,18 +173,50 @@ app.layout = html.Div(children=[
             [html.H6(id="number-pm100-text"), html.P(">10.0um")],
             id="number-pm100",
             className="mini-container",
-        ),
-    ], id="number-header", className="row container-display"),
+        )], 
+    	id="number-header", 
+    	className="row container-display"
+    ),
 
-	dcc.Graph(id='graph-temperature', animate=True),
-	dcc.Graph(id='graph-humidity', animate=True),
-	dcc.Graph(id='graph-pressure', animate=True),
-	dcc.Graph(id='graph-light', animate=True),
-	dcc.Graph(id='graph-gases', animate=True),
-	dcc.Graph(id='graph-particulates', animate=True),
+    html.Div([
+	    html.Div(
+	        [dcc.Graph(id='graph-temperature', animate=True)],
+	        className="pretty_container six columns",
+	    ),
+	    html.Div(
+	        [dcc.Graph(id='graph-humidity', animate=True)],
+	        className="pretty_container six columns",
+	    )],
+		className="row flex-display",
+    ),
+
+    html.Div([
+	    html.Div(
+	        [dcc.Graph(id='graph-pressure', animate=True)],
+	        className="pretty_container six columns",
+	    ),
+	    html.Div(
+	        [dcc.Graph(id='graph-light', animate=True)],
+	        className="pretty_container six columns",
+	    )],
+		className="row flex-display",
+    ),
+
+    html.Div([
+	    html.Div(
+	        [dcc.Graph(id='graph-gases', animate=True)],
+	        className="pretty_container six columns",
+	    ),
+	    html.Div(
+	        [dcc.Graph(id='graph-particulates', animate=True)],
+	        className="pretty_container six columns",
+	    )],
+		className="row flex-display",
+    ),
 
 	dcc.Interval(id='graph-update', interval=5*1000), # update every 5 seconds
-])
+
+], id="mainContainer", style={"display": "flex", "flex-direction": "column"})
 
 # --------------------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------- UTILITY FUNCTIONS
@@ -224,7 +267,7 @@ def update_graph_temperature(input_data):
 	except:
 		value = None
 	Y_temperature[1].append(value)
-	return (update_graph(X, [Y_temperature]), value)
+	return (update_graph(X, [Y_temperature]), round(value, 1))
 
 # Humidity
 @app.callback([Output('graph-humidity', 'figure'),
@@ -236,7 +279,7 @@ def update_graph_temperature(input_data):
 	except:
 		value = None
 	Y_humidity[1].append(value)
-	return (update_graph(X, [Y_humidity]), value)
+	return (update_graph(X, [Y_humidity]), round(value, 1))
 
 # Pressure
 @app.callback([Output('graph-pressure', 'figure'),
@@ -248,7 +291,7 @@ def update_graph_temperature(input_data):
 	except:
 		value = None
 	Y_pressure[1].append(value)
-	return (update_graph(X, [Y_pressure]), value)
+	return (update_graph(X, [Y_pressure]), round(value, 1))
 
 # Light
 @app.callback([Output('graph-light', 'figure'),
@@ -260,7 +303,7 @@ def update_graph_temperature(input_data):
 	except:
 		value = None
 	Y_light[1].append(value)
-	return (update_graph(X, [Y_light]), value)
+	return (update_graph(X, [Y_light]), round(value, 1))
 
 # Gases
 @app.callback([Output('graph-gases', 'figure'),
@@ -281,7 +324,8 @@ def update_graph_gases(input_data):
 	Y_gas_oxi[1].append(value_oxi)
 	Y_gas_red[1].append(value_red)
 	Y_gas_nh3[1].append(value_nh3)
-	return (update_graph(X, [Y_gas_oxi, Y_gas_red, Y_gas_nh3]), value_oxi, value_red, value_nh3)
+	return (update_graph(X, [Y_gas_oxi, Y_gas_red, Y_gas_nh3]), 
+			round(value_oxi, 1), round(value_red, 1), round(value_nh3, 1))
 
 # Particulate matter
 @app.callback([Output('graph-particulates', 'figure'),
@@ -315,7 +359,7 @@ def update_graph_particulates(input_data):
 	Y_pm_50[1].append(pm50)
 	Y_pm_100[1].append(pm100)
 	return (update_graph(X, [Y_pm_03, Y_pm_05, Y_pm_10, Y_pm_25, Y_pm_50, Y_pm_100]),
-		    pm3, pm5, pm10, pm25, pm50, pm100)
+		    round(pm3, 1), round(pm5, 1), round(pm10, 1), round(pm25, 1), round(pm50, 1), round(pm100, 1))
 
 # --------------------------------------------------------------------------------------------------
 # --------------------------------------------------------------------------------------- APP LAUNCH
