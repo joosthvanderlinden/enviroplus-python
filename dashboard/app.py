@@ -228,6 +228,16 @@ def unpack_arrays(Ys):
 				Y_all.append(y)
 	return Y_all
 
+def round_values(Ys):
+	values = []
+	for Y in Ys:
+		v = Y[-1]
+		if v is None:
+			values.append('')
+		else:
+			values.append(v)
+	return tuple(values)
+
 # --------------------------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------------ CHART UPDATES
 def create_scatter(X, Y):
@@ -245,7 +255,7 @@ def update_graph(X, Ys):
 	if (len(X) > 0) and (len(Y_all) > 0):
 		chart['layout'] = go.Layout(xaxis=dict(range=[min(X),     max(X)]),
 									yaxis=dict(range=[min(Y_all), max(Y_all)]))
-	return chart
+	return (chart) + round_values(Ys)
 
 # Time axis
 @app.callback(Output('counter', 'children'),
@@ -267,7 +277,7 @@ def update_graph_temperature(input_data):
 	except:
 		value = None
 	Y_temperature[1].append(value)
-	return (update_graph(X, [Y_temperature]), round(value, 1))
+	return update_graph(X, [Y_temperature])
 
 # Humidity
 @app.callback([Output('graph-humidity', 'figure'),
@@ -279,7 +289,7 @@ def update_graph_temperature(input_data):
 	except:
 		value = None
 	Y_humidity[1].append(value)
-	return (update_graph(X, [Y_humidity]), round(value, 1))
+	return update_graph(X, [Y_humidity])
 
 # Pressure
 @app.callback([Output('graph-pressure', 'figure'),
@@ -291,7 +301,7 @@ def update_graph_temperature(input_data):
 	except:
 		value = None
 	Y_pressure[1].append(value)
-	return (update_graph(X, [Y_pressure]), round(value, 1))
+	return update_graph(X, [Y_pressure])
 
 # Light
 @app.callback([Output('graph-light', 'figure'),
@@ -303,7 +313,7 @@ def update_graph_temperature(input_data):
 	except:
 		value = None
 	Y_light[1].append(value)
-	return (update_graph(X, [Y_light]), round(value, 1))
+	return update_graph(X, [Y_light])
 
 # Gases
 @app.callback([Output('graph-gases', 'figure'),
@@ -324,8 +334,7 @@ def update_graph_gases(input_data):
 	Y_gas_oxi[1].append(value_oxi)
 	Y_gas_red[1].append(value_red)
 	Y_gas_nh3[1].append(value_nh3)
-	return (update_graph(X, [Y_gas_oxi, Y_gas_red, Y_gas_nh3]), 
-			round(value_oxi, 1), round(value_red, 1), round(value_nh3, 1))
+	return update_graph(X, [Y_gas_oxi, Y_gas_red, Y_gas_nh3])
 
 # Particulate matter
 @app.callback([Output('graph-particulates', 'figure'),
@@ -358,8 +367,7 @@ def update_graph_particulates(input_data):
 	Y_pm_25[1].append(pm25)
 	Y_pm_50[1].append(pm50)
 	Y_pm_100[1].append(pm100)
-	return (update_graph(X, [Y_pm_03, Y_pm_05, Y_pm_10, Y_pm_25, Y_pm_50, Y_pm_100]),
-		    round(pm3, 1), round(pm5, 1), round(pm10, 1), round(pm25, 1), round(pm50, 1), round(pm100, 1))
+	return update_graph(X, [Y_pm_03, Y_pm_05, Y_pm_10, Y_pm_25, Y_pm_50, Y_pm_100])
 
 # --------------------------------------------------------------------------------------------------
 # --------------------------------------------------------------------------------------- APP LAUNCH
