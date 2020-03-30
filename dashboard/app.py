@@ -236,6 +236,7 @@ def round_values(Ys):
 			values.append('')
 		else:
 			values.append(v)
+	print(tuple(values))
 	return tuple(values)
 
 # --------------------------------------------------------------------------------------------------
