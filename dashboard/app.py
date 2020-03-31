@@ -1,21 +1,8 @@
 # TODO
-# - Add other charts to app.layout
-# 	- 3x2 grid of:
-#		- Temperature
-#		- Humidity
-#		- Pressure
-#		- Light
-#		- Gases (OX, RED, NH3)
-#		- Particulates (>0.3um, >0.5um, >1.0um, >2.5um, >5.0um, >10.0um)
 #
 # - Come up with some interesting numbers to display, perhaps based on experiments?
 #	- Inspiration: https://dash-gallery.plotly.host/Portal/
 #   - Main example: https://github.com/plotly/dash-sample-apps/tree/master/apps/dash-oil-and-gas
-#	
-# - Load all the data in app.callback, as in https://github.com/nophead/EnviroPlusWeb/blob/master/app.py
-# 	- Wrap chart update in seperate function but create a seperate callback for every chart
-#   - Come up with a way to show multiple lines in one chart (for gases and PMs)
-#   - Basics: https://dash.plotly.com/getting-started-part-2
 #
 # - Make particulate matter chart optional
 #
@@ -36,6 +23,7 @@ import plotly.graph_objs as go
 import random
 from collections import deque
 import time
+from datetime import datetime
 
 # Other imports
 import pandas as pd # import to fix bug in plotly
@@ -258,7 +246,7 @@ def create_scatter(X, name, values):
 				x           = list(X),
 				y           = list(values),
 				name        = name,
-				mode        = 'lines+markers',
+				mode        = 'lines',
 				connectgaps = False
 				)
 
@@ -276,10 +264,7 @@ def update_graph(X, Y):
 @app.callback(Output('counter', 'children'),
 			  [Input('graph-update', 'n_intervals')])
 def update_time(input_data):
-	if len(X) == 0:
-		X.append(1)
-	else:
-		X.append(X[-1]+1)
+	X.append(datetime.now())
 	return 'Most recent update: {}'.format(X[-1])
 	
 # Temperature
