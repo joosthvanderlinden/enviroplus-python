@@ -108,11 +108,14 @@ app.layout = html.Div([
             html.Div([
                 html.H3(
                     "Air Quality Dashboard",
-                    style={"margin-bottom": "0px", "align": "center"},
+                    style={"margin-bottom": "0px"},
                 ),
                 html.H5(
                     "Wouldn't cha know it.", 
-                    style={"margin-top": "0px", "align": "center"}
+                    style={"margin-top": "0px"}
+                ),
+                html.Div(
+                	id='counter'
                 )]
             )],
             className="one-half column",
@@ -143,7 +146,6 @@ app.layout = html.Div([
 	# 	style={"margin-bottom": "10px"},
  #    ),
 
-	html.Div(id='counter'),
 	# html.Div([
 	# 	html.Div(
  #            [html.H6(id="number-temperature-text"), html.P("Temperature")],
