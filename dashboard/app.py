@@ -10,6 +10,15 @@
 # 	- Examples: https://plotly.com/python/line-charts/
 
 # --------------------------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------- PARAMETERS
+
+# Frequency at which to retrieve sensor values
+frequency  = 10 # seconds
+
+# Number of data points to store
+num_points = 8640 # 24hrs @ 10 sec / point
+
+# --------------------------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------------------ IMPORTS
 # Plotly imports
 import dash
@@ -63,33 +72,33 @@ time.sleep(5.0)
 
 # --------------------------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------ DATA INITIALIZATION
-X             = deque(maxlen=20)
+X             = deque(maxlen=num_points)
 
 Y_temperature = {'title': 'Temperature',
 				 'units': 'C',
-				 'values': {'Temperature': deque(maxlen=20)}}
+				 'values': {'Temperature': deque(maxlen=num_points)}}
 Y_humidity    = {'title': 'Humidity',
 				 'units': '%',
-				 'values': {'Humidity':    deque(maxlen=20)}}
+				 'values': {'Humidity':    deque(maxlen=num_points)}}
 Y_pressure    = {'title': 'Pressure',
 				 'units': 'mBar',
-				 'values': {'Pressure':    deque(maxlen=20)}}
+				 'values': {'Pressure':    deque(maxlen=num_points)}}
 Y_light       = {'title': 'Light',
 				 'units': 'Lux',
-				 'values': {'Light':       deque(maxlen=20)}}
+				 'values': {'Light':       deque(maxlen=num_points)}}
 Y_gas         = {'title': 'Gases',
 				 'units': 'kΩ',
-				 'values': {'Oxidising':   deque(maxlen=20),
-				 			'Reducing':    deque(maxlen=20),
-				 			'NH3':         deque(maxlen=20)}}
+				 'values': {'Oxidising':   deque(maxlen=num_points),
+				 			'Reducing':    deque(maxlen=num_points),
+				 			'NH3':         deque(maxlen=num_points)}}
 Y_pms         = {'title': 'Particulate matters',
 				 'units': '/100cl',
-				 'values': {'>0.3um':      deque(maxlen=20),
-							'>0.5um':      deque(maxlen=20),
-							'>1.0um':      deque(maxlen=20),
-							'>2.5um':      deque(maxlen=20),
-							'>5.0um':      deque(maxlen=20),
-							'>10.0um':     deque(maxlen=20)}}
+				 'values': {'>0.3um':      deque(maxlen=num_points),
+							'>0.5um':      deque(maxlen=num_points),
+							'>1.0um':      deque(maxlen=num_points),
+							'>2.5um':      deque(maxlen=num_points),
+							'>5.0um':      deque(maxlen=num_points),
+							'>10.0um':     deque(maxlen=num_points)}}
 
 # --------------------------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------------------- LAYOUT
@@ -109,75 +118,75 @@ app.layout = html.Div(children=[
     ),
 
 	html.Div(id='counter'),
-	html.Div([
-		html.Div(
-            [html.H6(id="number-temperature-text"), html.P("Temperature")],
-            id="number-temperature",
-            className="number_container",
-        ),
-        html.Div(
-            [html.H6(id="number-humidity-text"), html.P("Humidity")],
-            id="number-humidity",
-            className="number_container",
-        ),
-        html.Div(
-            [html.H6(id="number-pressure-text"), html.P("Pressure")],
-            id="number-pressure",
-            className="number_container",
-        ),
-        html.Div(
-            [html.H6(id="number-light-text"), html.P("Light")],
-            id="number-light",
-            className="number_container",
-        ),
-        html.Div(
-            [html.H6(id="number-oxi-text"), html.P("Oxidising")],
-            id="number-oxi",
-            className="number_container",
-        ),
-        html.Div(
-            [html.H6(id="number-red-text"), html.P("Reducing")],
-            id="number-red",
-            className="number_container",
-        ),
-        html.Div(
-            [html.H6(id="number-nh3-text"), html.P("NH3")],
-            id="number-nh3",
-            className="number_container",
-        ),
-        html.Div(
-            [html.H6(id="number-pm03-text"), html.P(">0.3um")],
-            id="number-pm03",
-            className="number_container",
-        ),
-        html.Div(
-            [html.H6(id="number-pm05-text"), html.P(">0.5um")],
-            id="number-pm05",
-            className="number_container",
-        ),
-        html.Div(
-            [html.H6(id="number-pm10-text"), html.P(">1.0um")],
-            id="number-pm10",
-            className="number_container",
-        ),
-        html.Div(
-            [html.H6(id="number-pm25-text"), html.P(">2.5um")],
-            id="number-pm25",
-            className="number_container",
-        ),
-        html.Div(
-            [html.H6(id="number-pm50-text"), html.P(">5.0um")],
-            id="number-pm50",
-            className="number_container",
-        ),
-        html.Div(
-            [html.H6(id="number-pm100-text"), html.P(">10.0um")],
-            id="number-pm100",
-            className="number_container",
-        )], 
-    	id="number-header", 
-    	className="row container-display"
-    ),
+	# html.Div([
+	# 	html.Div(
+ #            [html.H6(id="number-temperature-text"), html.P("Temperature")],
+ #            id="number-temperature",
+ #            className="number_container",
+ #        ),
+ #        html.Div(
+ #            [html.H6(id="number-humidity-text"), html.P("Humidity")],
+ #            id="number-humidity",
+ #            className="number_container",
+ #        ),
+ #        html.Div(
+ #            [html.H6(id="number-pressure-text"), html.P("Pressure")],
+ #            id="number-pressure",
+ #            className="number_container",
+ #        ),
+ #        html.Div(
+ #            [html.H6(id="number-light-text"), html.P("Light")],
+ #            id="number-light",
+ #            className="number_container",
+ #        ),
+ #        html.Div(
+ #            [html.H6(id="number-oxi-text"), html.P("Oxidising")],
+ #            id="number-oxi",
+ #            className="number_container",
+ #        ),
+ #        html.Div(
+ #            [html.H6(id="number-red-text"), html.P("Reducing")],
+ #            id="number-red",
+ #            className="number_container",
+ #        ),
+ #        html.Div(
+ #            [html.H6(id="number-nh3-text"), html.P("NH3")],
+ #            id="number-nh3",
+ #            className="number_container",
+ #        ),
+ #        html.Div(
+ #            [html.H6(id="number-pm03-text"), html.P(">0.3um")],
+ #            id="number-pm03",
+ #            className="number_container",
+ #        ),
+ #        html.Div(
+ #            [html.H6(id="number-pm05-text"), html.P(">0.5um")],
+ #            id="number-pm05",
+ #            className="number_container",
+ #        ),
+ #        html.Div(
+ #            [html.H6(id="number-pm10-text"), html.P(">1.0um")],
+ #            id="number-pm10",
+ #            className="number_container",
+ #        ),
+ #        html.Div(
+ #            [html.H6(id="number-pm25-text"), html.P(">2.5um")],
+ #            id="number-pm25",
+ #            className="number_container",
+ #        ),
+ #        html.Div(
+ #            [html.H6(id="number-pm50-text"), html.P(">5.0um")],
+ #            id="number-pm50",
+ #            className="number_container",
+ #        ),
+ #        html.Div(
+ #            [html.H6(id="number-pm100-text"), html.P(">10.0um")],
+ #            id="number-pm100",
+ #            className="number_container",
+ #        )], 
+ #    	id="number-header", 
+ #    	className="row container-display"
+ #    ),
 
     html.Div([
 	    html.Div(
@@ -215,7 +224,7 @@ app.layout = html.Div(children=[
 		className="row flex-display",
     ),
 
-	dcc.Interval(id='graph-update', interval=5*1000), # update every 5 seconds
+	dcc.Interval(id='graph-update', interval=frequency*1000),
 
 ], id="mainContainer", style={"display": "flex", "flex-direction": "column"})
 
@@ -258,7 +267,7 @@ def update_graph(X, Y):
 									yaxis_title=Y['units'],
 									xaxis=dict(range=[min(X),     max(X)]),
 									yaxis=dict(range=[min(Y_all), max(Y_all)]))
-	return (chart,) + round_values(Y) # (chart,) creates single-item tuple
+	return (chart,)# + round_values(Y) # (chart,) creates single-item tuple
 
 # Time axis
 @app.callback(Output('counter', 'children'),
@@ -269,7 +278,8 @@ def update_time(input_data):
 	
 # Temperature
 @app.callback([Output('graph-temperature', 'figure'),
-	 		   Output('number-temperature-text', 'children')],
+	 		   # Output('number-temperature-text', 'children')
+	 		   ],
 			  [Input('graph-update', 'n_intervals')])
 def update_graph_temperature(input_data):
 	try:
@@ -281,7 +291,8 @@ def update_graph_temperature(input_data):
 
 # Humidity
 @app.callback([Output('graph-humidity', 'figure'),
-	 		   Output('number-humidity-text', 'children')],
+	 		   # Output('number-humidity-text', 'children')
+	 		   ],
 			  [Input('graph-update', 'n_intervals')])
 def update_graph_temperature(input_data):
 	try:
@@ -293,7 +304,8 @@ def update_graph_temperature(input_data):
 
 # Pressure
 @app.callback([Output('graph-pressure', 'figure'),
-	 		   Output('number-pressure-text', 'children')],
+	 		   # Output('number-pressure-text', 'children')
+	 		   ],
 			  [Input('graph-update', 'n_intervals')])
 def update_graph_temperature(input_data):
 	try:
@@ -305,7 +317,8 @@ def update_graph_temperature(input_data):
 
 # Light
 @app.callback([Output('graph-light', 'figure'),
-	 		   Output('number-light-text', 'children')],
+	 		   # Output('number-light-text', 'children')
+	 		   ],
 			  [Input('graph-update', 'n_intervals')])
 def update_graph_temperature(input_data):
 	try:
@@ -317,9 +330,10 @@ def update_graph_temperature(input_data):
 
 # Gases
 @app.callback([Output('graph-gases', 'figure'),
-	 		   Output('number-oxi-text', 'children'),
-	 		   Output('number-red-text', 'children'),
-	 		   Output('number-nh3-text', 'children')],
+	 		   # Output('number-oxi-text', 'children'),
+	 		   # Output('number-red-text', 'children'),
+	 		   # Output('number-nh3-text', 'children')
+	 		   ],
 			  [Input('graph-update', 'n_intervals')])
 def update_graph_gases(input_data):
 	try:
@@ -338,12 +352,13 @@ def update_graph_gases(input_data):
 
 # Particulate matter
 @app.callback([Output('graph-particulates', 'figure'),
-	 		   Output('number-pm03-text', 'children'),
-	 		   Output('number-pm05-text', 'children'),
-	 		   Output('number-pm10-text', 'children'),
-	 		   Output('number-pm25-text', 'children'),
-	 		   Output('number-pm50-text', 'children'),
-	 		   Output('number-pm100-text', 'children')],
+	 		   # Output('number-pm03-text', 'children'),
+	 		   # Output('number-pm05-text', 'children'),
+	 		   # Output('number-pm10-text', 'children'),
+	 		   # Output('number-pm25-text', 'children'),
+	 		   # Output('number-pm50-text', 'children'),
+	 		   # Output('number-pm100-text', 'children')
+	 		   ],
 			  [Input('graph-update', 'n_intervals')])
 def update_graph_particulates(input_data):
 	try:
