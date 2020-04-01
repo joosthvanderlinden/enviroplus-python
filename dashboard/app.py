@@ -104,51 +104,23 @@ Y_pms         = {'title': 'Particulate matters',
 # ------------------------------------------------------------------------------------------- LAYOUT
 app.layout = html.Div([
 	html.Div([
-        html.Div(
-            [
-                # html.Img(
-                #     src=app.get_asset_url("dash-logo.png"),
-                #     id="plotly-image",
-                #     style={
-                #         "height": "60px",
-                #         "width": "auto",
-                #         "margin-bottom": "25px",
-                #     },
-                # )
-            ],
-            className="one-third column",
-        ),
-        html.Div(
-            [
-                html.Div(
-                    [
-                        html.H3(
-                            "Air Quality Dashboard",
-                            style={"margin-bottom": "0px"},
-                        ),
-                        html.H5(
-                            "Wouldn't cha know it.", 
-                            style={"margin-top": "0px"}
-                        ),
-                    ]
-                )
-            ],
+        html.Div([
+            html.Div([
+                html.H3(
+                    "Air Quality Dashboard",
+                    style={"margin-bottom": "0px"},
+                ),
+                html.H5(
+                    "Wouldn't cha know it.", 
+                    style={"margin-top": "0px"}
+                )]
+            )],
             className="one-half column",
             id="title",
-        ),
-        html.Div(
-            [
-                # html.A(
-                #     html.Button("Learn More", id="learn-more-button"),
-                #     href="https://plot.ly/dash/pricing/",
-                # )
-            ],
-            className="one-third column",
-            id="button",
         )],
 	    id="header",
 	    className="row flex-display",
-	    style={"margin-bottom": "25px"},
+	    style={"margin-bottom": "25px", "align": "center"},
 	),
 
 	# html.Div([
@@ -194,12 +166,12 @@ app.layout = html.Div([
  #            className="number_container",
  #        ),
  #        html.Div(
- #            [html.H6(id="number-oxi-text"), html.P("Oxidising")],
+ #            [html.H6(id="number-oxi-text"), html.P("OX*10")],
  #            id="number-oxi",
  #            className="number_container",
  #        ),
  #        html.Div(
- #            [html.H6(id="number-red-text"), html.P("Reducing")],
+ #            [html.H6(id="number-red-text"), html.P("RED")],
  #            id="number-red",
  #            className="number_container",
  #        ),
@@ -400,8 +372,8 @@ def update_graph_gases(input_data):
 		value_oxi = None
 		value_red = None
 		value_nh3 = None
-	Y_gas['values']['Oxidising'].append(value_oxi)
-	Y_gas['values']['Reducing'].append(value_red)
+	Y_gas['values']['OX*10'].append(value_oxi)
+	Y_gas['values']['RED'].append(value_red)
 	Y_gas['values']['NH3'].append(value_nh3)
 	return update_graph(X, Y_gas)
 
