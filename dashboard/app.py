@@ -8,15 +8,24 @@
 #
 # - Add layout for different lines,
 # 	- Examples: https://plotly.com/python/line-charts/
+#
+# - Replace temperature with compensated-temperature
+#
+# - Ignore readings for first 2 minutes
+#   - add a countdown timer?
+# 
 
 # --------------------------------------------------------------------------------------------------
 # --------------------------------------------------------------------------------------- PARAMETERS
-
 # Frequency at which to retrieve sensor values
-frequency  = 10 # seconds
+frequency   = 10 # seconds
 
 # Number of data points to store
-num_points = 8640 # 24hrs @ 10 sec / point
+num_points  = 8640 # 24hrs @ 10 sec / point
+
+# Set to true to ignore readings during warmup
+warmup      = True
+warmup_time = 60 # seconds
 
 # --------------------------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------------------ IMPORTS
@@ -46,6 +55,8 @@ app = dash.Dash(
 
 # --------------------------------------------------------------------------------------------------
 # ---------------------------------------------------------------------------- SENSOR INITIALIZATION
+start_time = datetime.now()
+
 # BME280 weather sensor
 from bme280 import BME280
 try:
@@ -303,7 +314,14 @@ def update_graph(X, Y):
 			  [Input('graph-update', 'n_intervals')])
 def update_time(input_data):
 	X.append(datetime.now())
-	return 'Most recent update: {}'.format(X[-1])
+	if warmup:
+		elapsed = (datetime.now() - start_time).total_seconds()
+		if elapsed < warmup_time:
+			return 'Warming up: {} seconds remaining'.format(warmup_time - elapsed)
+		else:
+			warmup = False
+	else:
+		return 'Most recent update: {}'.format(X[-1])
 	
 # Temperature
 @app.callback([Output('graph-temperature', 'figure'),
@@ -312,7 +330,10 @@ def update_time(input_data):
 			  [Input('graph-update', 'n_intervals')])
 def update_graph_temperature(input_data):
 	try:
-		value = bme280.get_temperature()
+		if warmup:
+			value = None
+		else:
+			value = bme280.get_temperature()
 	except:
 		value = None
 	Y_temperature['values']['Temperature'].append(value)
@@ -325,7 +346,10 @@ def update_graph_temperature(input_data):
 			  [Input('graph-update', 'n_intervals')])
 def update_graph_temperature(input_data):
 	try:
-		value = bme280.get_humidity()
+		if warmup:
+			value = None
+		else:
+			value = bme280.get_humidity()
 	except:
 		value = None
 	Y_humidity['values']['Humidity'].append(value)
@@ -338,7 +362,10 @@ def update_graph_temperature(input_data):
 			  [Input('graph-update', 'n_intervals')])
 def update_graph_temperature(input_data):
 	try:
-		value = bme280.get_pressure()
+		if warmup:
+			value = None
+		else:
+			value = bme280.get_pressure()
 	except:
 		value = None
 	Y_pressure['values']['Pressure'].append(value)
@@ -351,7 +378,10 @@ def update_graph_temperature(input_data):
 			  [Input('graph-update', 'n_intervals')])
 def update_graph_temperature(input_data):
 	try:
-		value = ltr559.get_lux()
+		if warmup:
+			value = None
+		else:
+			value = ltr559.get_lux()
 	except:
 		value = None
 	Y_light['values']['Light'].append(value)
@@ -366,10 +396,15 @@ def update_graph_temperature(input_data):
 			  [Input('graph-update', 'n_intervals')])
 def update_graph_gases(input_data):
 	try:
-		gases = gas.read_all()
-		value_oxi = gases.oxidising / 100 # adjusted to fit chart better
-		value_red = gases.reducing / 1000
-		value_nh3 = gases.nh3 / 1000
+		if warmup:
+			value_oxi = None
+			value_red = None
+			value_nh3 = None
+		else:
+			gases = gas.read_all()
+			value_oxi = gases.oxidising / 100 # adjusted to fit chart better
+			value_red = gases.reducing / 1000
+			value_nh3 = gases.nh3 / 1000
 	except:
 		value_oxi = None
 		value_red = None
@@ -391,13 +426,21 @@ def update_graph_gases(input_data):
 			  [Input('graph-update', 'n_intervals')])
 def update_graph_particulates(input_data):
 	try:
-		particles = pms5003.read()
-		pm100 = particles.pm_per_1l_air(10.0)
-		pm50  = particles.pm_per_1l_air(5.0) - pm100
-		pm25  = particles.pm_per_1l_air(2.5) - pm100 - pm50
-		pm10  = particles.pm_per_1l_air(1.0) - pm100 - pm50 - pm25
-		pm5   = particles.pm_per_1l_air(0.5) - pm100 - pm50 - pm25 - pm10
-		pm3   = particles.pm_per_1l_air(0.3) - pm100 - pm50 - pm25 - pm10 - pm5
+		if warmup:
+			pm100 = None
+			pm50  = None
+			pm25  = None
+			pm10  = None
+			pm5   = None
+			pm3   = None
+		else:
+			particles = pms5003.read()
+			pm100 = particles.pm_per_1l_air(10.0)
+			pm50  = particles.pm_per_1l_air(5.0) - pm100
+			pm25  = particles.pm_per_1l_air(2.5) - pm100 - pm50
+			pm10  = particles.pm_per_1l_air(1.0) - pm100 - pm50 - pm25
+			pm5   = particles.pm_per_1l_air(0.5) - pm100 - pm50 - pm25 - pm10
+			pm3   = particles.pm_per_1l_air(0.3) - pm100 - pm50 - pm25 - pm10 - pm5
 	except:
 		pm100 = None
 		pm50  = None
