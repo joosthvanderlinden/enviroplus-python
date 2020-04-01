@@ -108,11 +108,11 @@ app.layout = html.Div([
             html.Div([
                 html.H3(
                     "Air Quality Dashboard",
-                    style={"margin-bottom": "0px"},
+                    style={"margin-bottom": "0px", "align": "center"},
                 ),
                 html.H5(
                     "Wouldn't cha know it.", 
-                    style={"margin-top": "0px"}
+                    style={"margin-top": "0px", "align": "center"}
                 )]
             )],
             className="one-half column",
@@ -120,7 +120,7 @@ app.layout = html.Div([
         )],
 	    id="header",
 	    className="row flex-display",
-	    style={"margin-bottom": "25px", "align": "center"},
+	    style={"margin-bottom": "25px"},
 	),
 
 	# html.Div([
