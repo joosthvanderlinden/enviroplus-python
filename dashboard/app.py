@@ -257,7 +257,7 @@ def create_scatter(X, name, values):
 				name        = name,
 				mode        = 'lines',
 				connectgaps = False,
-				line_shape  = 'hv' # weird wiggles - replace with something else
+				line_shape  = 'hv' 
 				)
 
 def update_graph(X, Y):
