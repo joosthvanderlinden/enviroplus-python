@@ -88,8 +88,8 @@ Y_light       = {'title': 'Light',
 				 'values': {'Light':       deque(maxlen=num_points)}}
 Y_gas         = {'title': 'Gases',
 				 'units': 'kΩ',
-				 'values': {'Oxidising':   deque(maxlen=num_points),
-				 			'Reducing':    deque(maxlen=num_points),
+				 'values': {'OX*10':       deque(maxlen=num_points),
+				 			'RED':         deque(maxlen=num_points),
 				 			'NH3':         deque(maxlen=num_points)}}
 Y_pms         = {'title': 'Particulate matters',
 				 'units': '/100cl',
@@ -102,20 +102,74 @@ Y_pms         = {'title': 'Particulate matters',
 
 # --------------------------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------------------- LAYOUT
-app.layout = html.Div(children=[
+app.layout = html.Div([
 	html.Div([
-	    html.Div([
-            html.H3(
-                "Air Quality Dashboard",
-                style={"margin-bottom": "0px"},
-            )],
-	        className="one-half column",
-	        id="title",
-	    )], 
+        html.Div(
+            [
+                # html.Img(
+                #     src=app.get_asset_url("dash-logo.png"),
+                #     id="plotly-image",
+                #     style={
+                #         "height": "60px",
+                #         "width": "auto",
+                #         "margin-bottom": "25px",
+                #     },
+                # )
+            ],
+            className="one-third column",
+        ),
+        html.Div(
+            [
+                html.Div(
+                    [
+                        html.H3(
+                            "Air Quality Dashboard",
+                            style={"margin-bottom": "0px"},
+                        ),
+                        html.H5(
+                            "Wouldn't cha know it.", 
+                            style={"margin-top": "0px"}
+                        ),
+                    ]
+                )
+            ],
+            className="one-half column",
+            id="title",
+        ),
+        html.Div(
+            [
+                # html.A(
+                #     html.Button("Learn More", id="learn-more-button"),
+                #     href="https://plot.ly/dash/pricing/",
+                # )
+            ],
+            className="one-third column",
+            id="button",
+        )],
 	    id="header",
-		className="row flex-display",
-		style={"margin-bottom": "25px"},
-    ),
+	    className="row flex-display",
+	    style={"margin-bottom": "25px"},
+	),
+
+	# html.Div([
+	#     html.Div([
+ #            html.H3(
+ #                "Air Quality Dashboard",
+ #                style={"margin-bottom": "0px"},
+ #            ),
+ #            html.H5(
+ #                "Wouldn't cha know it", 
+ #                style={"margin-top": "0px"}
+ #            )],
+	#         className="one-half column",
+	#         id="title",
+	#     ),
+	#     html.Div(id='counter')
+	#     ], 
+	#     id="header",
+	# 	className="row flex-display",
+	# 	style={"margin-bottom": "10px"},
+ #    ),
 
 	html.Div(id='counter'),
 	# html.Div([
@@ -339,7 +393,7 @@ def update_graph_temperature(input_data):
 def update_graph_gases(input_data):
 	try:
 		gases = gas.read_all()
-		value_oxi = gases.oxidising / 1000
+		value_oxi = gases.oxidising / 100 # adjusted to fit chart better
 		value_red = gases.reducing / 1000
 		value_nh3 = gases.nh3 / 1000
 	except:
