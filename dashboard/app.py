@@ -256,7 +256,8 @@ def create_scatter(X, name, values):
 				y           = list(values),
 				name        = name,
 				mode        = 'lines',
-				connectgaps = False
+				connectgaps = False,
+				line_shape  = 'spline' # too expensive?
 				)
 
 def update_graph(X, Y):
