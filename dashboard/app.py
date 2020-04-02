@@ -72,12 +72,16 @@ time.sleep(5.0)
 # --------------------------------------------------------------------------------------------------
 # --------------------------------------------------------------------------------------- PARAMETERS
 # Frequency at which to retrieve sensor values
-frequency   = 10 # seconds
+global frequency
+frequency = 10 # seconds
 
 # Number of data points to store
-num_points  = 8640 # 24hrs @ 10 sec / point
+global num_points
+num_points = 8640 # 24hrs @ 10 sec / point
 
 # Set to true to ignore readings during warmup
+global warmup
+global warmup_time
 warmup      = True
 warmup_time = 60 # seconds
 
