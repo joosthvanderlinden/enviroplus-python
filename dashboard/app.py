@@ -16,18 +16,6 @@
 # 
 
 # --------------------------------------------------------------------------------------------------
-# --------------------------------------------------------------------------------------- PARAMETERS
-# Frequency at which to retrieve sensor values
-frequency   = 10 # seconds
-
-# Number of data points to store
-num_points  = 8640 # 24hrs @ 10 sec / point
-
-# Set to true to ignore readings during warmup
-warmup      = True
-warmup_time = 60 # seconds
-
-# --------------------------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------------------ IMPORTS
 # Plotly imports
 import dash
@@ -80,6 +68,18 @@ from enviroplus import gas
 from pms5003 import PMS5003, ReadTimeoutError
 pms5003 = PMS5003()
 time.sleep(5.0)
+
+# --------------------------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------- PARAMETERS
+# Frequency at which to retrieve sensor values
+frequency   = 10 # seconds
+
+# Number of data points to store
+num_points  = 8640 # 24hrs @ 10 sec / point
+
+# Set to true to ignore readings during warmup
+warmup      = True
+warmup_time = 60 # seconds
 
 # --------------------------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------ DATA INITIALIZATION
