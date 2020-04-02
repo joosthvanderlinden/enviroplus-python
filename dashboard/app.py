@@ -119,7 +119,7 @@ app.layout = html.Div([
         html.Div([
             html.Div([
                 html.H3(
-                    "Air Quality Dashboard",
+                    "Joost's Air Quality Dashboard",
                     style={"margin-bottom": "0px"},
                 ),
                 html.H5(
