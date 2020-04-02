@@ -13,7 +13,12 @@
 #
 # - Ignore readings for first 2 minutes
 #   - add a countdown timer?
+#   - https://dash.plotly.com/dash-core-components/store
+#
+# - Use this container to store data
+#   - https://dash.plotly.com/dash-core-components/store
 # 
+#
 
 # --------------------------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------------------ IMPORTS
@@ -310,14 +315,14 @@ def update_graph(X, Y):
 			  [Input('graph-update', 'n_intervals')])
 def update_time(input_data):
 	X.append(datetime.now())
-	if warmup:
-		elapsed = (datetime.now() - start_time).total_seconds()
-		if elapsed < warmup_time:
-			return 'Warming up: {} seconds remaining'.format(warmup_time - elapsed)
-		else:
-			warmup = False
-	else:
-		return 'Most recent update: {}'.format(X[-1])
+	# if warmup:
+	# 	elapsed = (datetime.now() - start_time).total_seconds()
+	# 	if elapsed < warmup_time:
+	# 		return 'Warming up: {} seconds remaining'.format(warmup_time - elapsed)
+	# 	else:
+	# 		warmup = False
+	# else:
+	return 'Most recent update: {}'.format(X[-1])
 	
 # Temperature
 @app.callback([Output('graph-temperature', 'figure'),
