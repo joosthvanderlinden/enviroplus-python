@@ -220,11 +220,20 @@ def update_time(input_data):
 	return 'Most recent update: {}'.format(X[-1])
 	
 # Temperature
+def get_cpu_temperature():
+	with open("/sys/class/thermal/thermal_zone0/temp", "r") as f:
+		temp = f.read()
+		temp = int(temp) / 1000.0
+	return temp
+
 @app.callback(Output('graph-temperature', 'figure'),
 			  [Input('graph-update', 'n_intervals')])
 def update_graph_temperature(input_data):
 	try:
-		value = bme280.get_temperature()
+		factor       = 2.25
+		cpu_temp     = get_cpu_temperature()
+	    raw_temp     = bme280.get_temperature()
+	    value        = raw_temp - ((cpu_temp - raw_temp) / factor)
 	except:
 		value = None
 	Y_temperature['values']['Temperature'].append(value)
