@@ -116,6 +116,10 @@ app.layout = html.Div([
                 html.Div(
                 	id='counter'
                 ),
+                html.Div(
+                	id='reset', 
+                	style={'display': 'none'}
+                ),
                 html.Button('Reset', id='button')]
             )],
             className="one-half column",
@@ -278,7 +282,7 @@ def round_values(Y):
 
 # --------------------------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------------- RESET BUTTON
-@app.callback(Output('counter', 'children'),
+@app.callback(Output('reset', 'children'),
 			  [Input('button', 'n_clicks')])
 def reset_data(n_clicks, value):
 	X.clear()
@@ -295,7 +299,7 @@ def reset_data(n_clicks, value):
 	Y_pms['values']['>2.5um'].clear()
 	Y_pms['values']['>5.0um'].clear()
 	Y_pms['values']['>10.0um'].clear()
-	return 'Resetting...'
+	return ''
 
 # --------------------------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------------ CHART UPDATES
