@@ -295,7 +295,7 @@ def reset_data(n_clicks, value):
 	Y_pms['values']['>2.5um'].clear()
 	Y_pms['values']['>5.0um'].clear()
 	Y_pms['values']['>10.0um'].clear()
-    return 'Resetting...'
+	return 'Resetting...'
 
 # --------------------------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------------ CHART UPDATES
