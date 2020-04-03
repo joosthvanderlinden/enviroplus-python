@@ -284,7 +284,7 @@ def round_values(Y):
 # ------------------------------------------------------------------------------------- RESET BUTTON
 @app.callback(Output('reset', 'children'),
 			  [Input('button', 'n_clicks')])
-def reset_data(n_clicks, value):
+def reset_data(n_clicks):
 	X.clear()
 	Y_temperature['values']['Temperature'].clear()
 	Y_humidity['values']['Humidity'].clear()
