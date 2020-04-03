@@ -291,7 +291,7 @@ def update_graph_temperature(input_data):
 
 # Gases
 @app.callback([Output('graph-gases-red-nh3', 'figure'),
-	           Output('graph-gases-ox', 'figure')]
+	           Output('graph-gases-ox', 'figure')],
 			  [Input('graph-update', 'n_intervals')])
 def update_graph_gases(input_data):
 	try:
