@@ -1,7 +1,5 @@
 # TODO
 #
-# - Add a reset button to clear all data (alternative, use dash counter to test for warmup)
-# - Replace temperature with compensated-temperature 
 # - Make particulate matter chart optional
 # - Use this container to store data: https://dash.plotly.com/dash-core-components/store
 # 
@@ -73,31 +71,32 @@ num_points = 8640 # 24hrs @ 10 sec / point
 # ------------------------------------------------------------------------------ DATA INITIALIZATION
 X             = deque(maxlen=num_points)
 
+cpu_temps     = deque(maxlen=5)
 Y_temperature = {'title': 'Temperature',
 				 'units': 'C',
-				 'values': {'Temperature': deque(maxlen=num_points)}}
+				 'values': {'Temperature':     deque(maxlen=num_points)}}
 Y_humidity    = {'title': 'Humidity',
 				 'units': '%',
-				 'values': {'Humidity':    deque(maxlen=num_points)}}
+				 'values': {'Humidity':        deque(maxlen=num_points)}}
 Y_pressure    = {'title': 'Pressure',
 				 'units': 'mBar',
-				 'values': {'Pressure':    deque(maxlen=num_points)}}
+				 'values': {'Pressure':        deque(maxlen=num_points)}}
 Y_light       = {'title': 'Light',
 				 'units': 'Lux',
-				 'values': {'Light':       deque(maxlen=num_points)}}
+				 'values': {'Light':           deque(maxlen=num_points)}}
 Y_gas         = {'title': 'Gases',
 				 'units': 'kΩ',
-				 'values': {'OX*10':       deque(maxlen=num_points),
-				 			'RED':         deque(maxlen=num_points),
-				 			'NH3':         deque(maxlen=num_points)}}
+				 'values': {'OX*10':           deque(maxlen=num_points),
+				 			'RED':             deque(maxlen=num_points),
+				 			'NH3':             deque(maxlen=num_points)}}
 Y_pms         = {'title': 'Particulate matters',
 				 'units': '/100cl',
-				 'values': {'>0.3um':      deque(maxlen=num_points),
-							'>0.5um':      deque(maxlen=num_points),
-							'>1.0um':      deque(maxlen=num_points),
-							'>2.5um':      deque(maxlen=num_points),
-							'>5.0um':      deque(maxlen=num_points),
-							'>10.0um':     deque(maxlen=num_points)}}
+				 'values': {'>0.3um':          deque(maxlen=num_points),
+							'>0.5um':          deque(maxlen=num_points),
+							'>1.0um':          deque(maxlen=num_points),
+							'>2.5um':          deque(maxlen=num_points),
+							'>5.0um':          deque(maxlen=num_points),
+							'>10.0um':         deque(maxlen=num_points)}}
 
 # --------------------------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------------------- LAYOUT
@@ -231,9 +230,10 @@ def get_cpu_temperature():
 def update_graph_temperature(input_data):
 	try:
 		factor       = 2.25
-		cpu_temp     = get_cpu_temperature()
+		cpu_temps.append(get_cpu_temperature())
+		avg_cpu_temp = sum(cpu_temps) / float(len(cpu_temps))
 		raw_temp     = bme280.get_temperature()
-		value        = raw_temp - ((cpu_temp - raw_temp) / factor)
+		value        = raw_temp - ((avg_cpu_temp - raw_temp) / factor)
 	except:
 		value = None
 	Y_temperature['values']['Temperature'].append(value)
