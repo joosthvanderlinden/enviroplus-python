@@ -1,24 +1,11 @@
 # TODO
 #
-# - Come up with some interesting numbers to display, perhaps based on experiments?
-#	- Inspiration: https://dash-gallery.plotly.host/Portal/
-#   - Main example: https://github.com/plotly/dash-sample-apps/tree/master/apps/dash-oil-and-gas
-#
+# - Add a reset button to clear all data (alternative, use dash counter to test for warmup)
+# - Replace temperature with compensated-temperature 
 # - Make particulate matter chart optional
-#
-# - Add layout for different lines,
-# 	- Examples: https://plotly.com/python/line-charts/
-#
-# - Replace temperature with compensated-temperature
-#
-# - Ignore readings for first 2 minutes
-#   - add a countdown timer?
-#   - https://dash.plotly.com/dash-core-components/store
-#
-# - Use this container to store data
-#   - https://dash.plotly.com/dash-core-components/store
+# - Use this container to store data: https://dash.plotly.com/dash-core-components/store
 # 
-#
+
 
 # --------------------------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------------------ IMPORTS
@@ -128,7 +115,8 @@ app.layout = html.Div([
                 ),
                 html.Div(
                 	id='counter'
-                )]
+                ),
+                html.Button('Reset', id='button')]
             )],
             className="one-half column",
             id="title",
@@ -289,6 +277,27 @@ def round_values(Y):
 	return tuple(rounded)
 
 # --------------------------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------------- RESET BUTTON
+@app.callback(Output('counter', 'children'),
+			  [Input('button', 'n_clicks')])
+def reset_data(n_clicks, value):
+	X.clear()
+	Y_temperature['values']['Temperature'].clear()
+	Y_humidity['values']['Humidity'].clear()
+	Y_pressure['values']['Pressure'].clear()
+	Y_light['values']['Light'].clear()
+	Y_gas['values']['OX*10'].clear()
+	Y_gas['values']['RED'].clear()
+	Y_gas['values']['NH3'].clear()
+	Y_pms['values']['>0.3um'].clear()
+	Y_pms['values']['>0.5um'].clear()
+	Y_pms['values']['>1.0um'].clear()
+	Y_pms['values']['>2.5um'].clear()
+	Y_pms['values']['>5.0um'].clear()
+	Y_pms['values']['>10.0um'].clear()
+    return 'Resetting...'
+
+# --------------------------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------------ CHART UPDATES
 def create_scatter(X, name, values):
 	return plotly.graph_objs.Scatter(
@@ -297,7 +306,6 @@ def create_scatter(X, name, values):
 				name        = name,
 				mode        = 'lines',
 				connectgaps = False,
-				line_shape  = 'hv' 
 				)
 
 def update_graph(X, Y):
