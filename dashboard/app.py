@@ -84,19 +84,24 @@ Y_pressure    = {'title': 'Pressure',
 Y_light       = {'title': 'Light',
 				 'units': 'Lux',
 				 'values': {'Light':           deque(maxlen=num_points)}}
-Y_gas         = {'title': 'Gases',
+Y_gas_red_nh3 = {'title': 'Reducing and NH3 gases',
 				 'units': 'kΩ',
-				 'values': {'OX*10':           deque(maxlen=num_points),
-				 			'RED':             deque(maxlen=num_points),
+				 'values': {'RED':             deque(maxlen=num_points),
 				 			'NH3':             deque(maxlen=num_points)}}
-Y_pms         = {'title': 'Particulate matters',
-				 'units': '/100cl',
-				 'values': {'>0.3um':          deque(maxlen=num_points),
-							'>0.5um':          deque(maxlen=num_points),
-							'>1.0um':          deque(maxlen=num_points),
-							'>2.5um':          deque(maxlen=num_points),
-							'>5.0um':          deque(maxlen=num_points),
-							'>10.0um':         deque(maxlen=num_points)}}
+Y_gas_ox      = {'title': 'Oxidising gases',
+				 'units': 'kΩ',
+				 'values': {'OX':              deque(maxlen=num_points)}}
+Y_pms_small   = {'title': 'Particulate matters (small)',
+				 'units': 'per 0.1L of air',
+				 'values': {'0.3 - 0.5 um':    deque(maxlen=num_points),
+							'0.5 - 1.0 um':    deque(maxlen=num_points)}}
+Y_pms_large   = {'title': 'Particulate matters (large)',
+				 'units': 'per 0.1L of air',
+				 'values': {'1.0 - 2.5  um':   deque(maxlen=num_points),
+							'2.5 - 5.0  um':   deque(maxlen=num_points),
+							'5.0 - 10.0 um':   deque(maxlen=num_points),
+							'>10.0 um':        deque(maxlen=num_points)}}
+
 
 # --------------------------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------------------- LAYOUT
@@ -143,11 +148,23 @@ app.layout = html.Div([
 
     html.Div([
 	    html.Div(
-	        [dcc.Graph(id='graph-gases', animate=True)],
+	        [dcc.Graph(id='graph-gases-red-nh3', animate=True)],
 	        className="chart_container six columns",
 	    ),
 	    html.Div(
-	        [dcc.Graph(id='graph-particulates', animate=True)],
+	        [dcc.Graph(id='graph-gases-ox', animate=True)],
+	        className="chart_container six columns",
+	    )],
+		className="row flex-display",
+    ),
+
+    html.Div([
+	    html.Div(
+	        [dcc.Graph(id='graph-particulates-small', animate=True)],
+	        className="chart_container six columns",
+	    ),
+	    html.Div(
+	        [dcc.Graph(id='graph-particulates-large', animate=True)],
 	        className="chart_container six columns",
 	    )],
 		className="row flex-display",
@@ -273,25 +290,33 @@ def update_graph_temperature(input_data):
 	return update_graph(X, Y_light)
 
 # Gases
-@app.callback(Output('graph-gases', 'figure'),
+@app.callback(Output('graph-gases-red-nh3', 'figure'),
 			  [Input('graph-update', 'n_intervals')])
 def update_graph_gases(input_data):
 	try:
 		gases = gas.read_all()
-		value_oxi = gases.oxidising / 100 # adjusted to fit chart better
 		value_red = gases.reducing / 1000
 		value_nh3 = gases.nh3 / 1000
 	except:
-		value_oxi = None
 		value_red = None
 		value_nh3 = None
-	Y_gas['values']['OX*10'].append(value_oxi)
-	Y_gas['values']['RED'].append(value_red)
-	Y_gas['values']['NH3'].append(value_nh3)
-	return update_graph(X, Y_gas)
+	Y_gas_red_nh3['values']['RED'].append(value_red)
+	Y_gas_red_nh3['values']['NH3'].append(value_nh3)
+	return update_graph(X, Y_gas_red_nh3)
+
+@app.callback(Output('graph-gases-ox', 'figure'),
+			  [Input('graph-update', 'n_intervals')])
+def update_graph_gases(input_data):
+	try:
+		gases = gas.read_all()
+		value_oxi = gases.oxidising / 1000
+	except:
+		value_oxi = None
+	Y_gas_ox['values']['OX'].append(value_oxi)
+	return update_graph(X, Y_gas_ox)
 
 # Particulate matter
-@app.callback(Output('graph-particulates', 'figure'),
+@app.callback(Output('graph-particulates-small', 'figure'),
 			  [Input('graph-update', 'n_intervals')])
 def update_graph_particulates(input_data):
 	try:
@@ -309,13 +334,29 @@ def update_graph_particulates(input_data):
 		pm10  = None
 		pm5   = None
 		pm3   = None
-	Y_pms['values']['>0.3um'].append(pm3)
-	Y_pms['values']['>0.5um'].append(pm5)
-	Y_pms['values']['>1.0um'].append(pm10)
-	Y_pms['values']['>2.5um'].append(pm25)
-	Y_pms['values']['>5.0um'].append(pm50)
-	Y_pms['values']['>10.0um'].append(pm100)
-	return update_graph(X, Y_pms)
+	Y_pms_small['values']['>0.3um'].append(pm3)
+	Y_pms_small['values']['>0.5um'].append(pm5)
+	return update_graph(X, Y_pms_small)
+
+@app.callback(Output('graph-particulates-large', 'figure'),
+			  [Input('graph-update', 'n_intervals')])
+def update_graph_particulates(input_data):
+	try:
+		particles = pms5003.read()
+		pm100 = particles.pm_per_1l_air(10.0)
+		pm50  = particles.pm_per_1l_air(5.0) - pm100
+		pm25  = particles.pm_per_1l_air(2.5) - pm100 - pm50
+		pm10  = particles.pm_per_1l_air(1.0) - pm100 - pm50 - pm25
+	except:
+		pm100 = None
+		pm50  = None
+		pm25  = None
+		pm10  = None
+	Y_pms_large['values']['>1.0um'].append(pm10)
+	Y_pms_large['values']['>2.5um'].append(pm25)
+	Y_pms_large['values']['>5.0um'].append(pm50)
+	Y_pms_large['values']['>10.0um'].append(pm100)
+	return update_graph(X, Y_pms_large)
 
 # --------------------------------------------------------------------------------------------------
 # --------------------------------------------------------------------------------------- APP LAUNCH
