@@ -328,14 +328,10 @@ def update_graph_particulates(input_data):
 		pm5   = particles.pm_per_1l_air(0.5) - pm100 - pm50 - pm25 - pm10
 		pm3   = particles.pm_per_1l_air(0.3) - pm100 - pm50 - pm25 - pm10 - pm5
 	except:
-		pm100 = None
-		pm50  = None
-		pm25  = None
-		pm10  = None
 		pm5   = None
 		pm3   = None
-	Y_pms_small['values']['>0.3um'].append(pm3)
-	Y_pms_small['values']['>0.5um'].append(pm5)
+	Y_pms_small['values']['0.3 - 0.5 um'].append(pm3)
+	Y_pms_small['values']['0.5 - 1.0 um'].append(pm5)
 	return update_graph(X, Y_pms_small)
 
 @app.callback(Output('graph-particulates-large', 'figure'),
@@ -352,10 +348,10 @@ def update_graph_particulates(input_data):
 		pm50  = None
 		pm25  = None
 		pm10  = None
-	Y_pms_large['values']['>1.0um'].append(pm10)
-	Y_pms_large['values']['>2.5um'].append(pm25)
-	Y_pms_large['values']['>5.0um'].append(pm50)
-	Y_pms_large['values']['>10.0um'].append(pm100)
+	Y_pms_large['values']['1.0 - 2.5  um'].append(pm10)
+	Y_pms_large['values']['2.5 - 5.0  um'].append(pm25)
+	Y_pms_large['values']['5.0 - 10.0 um'].append(pm50)
+	Y_pms_large['values']['>10.0 um'].append(pm100)
 	return update_graph(X, Y_pms_large)
 
 # --------------------------------------------------------------------------------------------------
