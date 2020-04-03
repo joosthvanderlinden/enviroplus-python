@@ -88,7 +88,7 @@ Y_gas_red_nh3 = {'title': 'Reducing and NH3 gases',
 				 'units': 'kΩ',
 				 'values': {'RED':             deque(maxlen=num_points),
 				 			'NH3':             deque(maxlen=num_points)}}
-Y_gas_ox      = {'title': 'Oxidising gases',
+Y_gas_oxi     = {'title': 'Oxidising gases',
 				 'units': 'kΩ',
 				 'values': {'OX':              deque(maxlen=num_points)}}
 Y_pms_small   = {'title': 'Particulate matters (small)',
@@ -198,7 +198,7 @@ def reset_data(n_clicks):
 		Y_light['values']['Light'].clear()
 		Y_gas_red_nh3['values']['RED'].clear()
 		Y_gas_red_nh3['values']['NH3'].clear()
-		Y_gas_ox['values']['OX'].clear()
+		Y_gas_oxi['values']['OX'].clear()
 		Y_pms_small['values']['0.3 - 0.5 um'].clear()
 		Y_pms_small['values']['0.5 - 1.0 um'].clear()
 		Y_pms_large['values']['1.0 - 2.5  um'].clear()
@@ -290,33 +290,27 @@ def update_graph_temperature(input_data):
 	return update_graph(X, Y_light)
 
 # Gases
-@app.callback(Output('graph-gases-red-nh3', 'figure'),
+@app.callback([Output('graph-gases-red-nh3', 'figure'),
+	           Output('graph-gases-ox', 'figure')]
 			  [Input('graph-update', 'n_intervals')])
 def update_graph_gases(input_data):
 	try:
 		gases = gas.read_all()
 		value_red = gases.reducing / 1000
 		value_nh3 = gases.nh3 / 1000
+		value_oxi = gases.oxidising / 1000
 	except:
 		value_red = None
 		value_nh3 = None
+		value_oxi = None
 	Y_gas_red_nh3['values']['RED'].append(value_red)
 	Y_gas_red_nh3['values']['NH3'].append(value_nh3)
-	return update_graph(X, Y_gas_red_nh3)
-
-@app.callback(Output('graph-gases-ox', 'figure'),
-			  [Input('graph-update', 'n_intervals')])
-def update_graph_gases(input_data):
-	try:
-		gases = gas.read_all()
-		value_oxi = gases.oxidising / 1000
-	except:
-		value_oxi = None
-	Y_gas_ox['values']['OX'].append(value_oxi)
-	return update_graph(X, Y_gas_ox)
+	Y_gas_oxi['values']['OX'].append(value_oxi)
+	return (update_graph(X, Y_gas_red_nh3), update_graph(X, Y_gas_oxi))
 
 # Particulate matter
-@app.callback(Output('graph-particulates-small', 'figure'),
+@app.callback([Output('graph-particulates-small', 'figure'),
+			   Output('graph-particulates-large', 'figure')],
 			  [Input('graph-update', 'n_intervals')])
 def update_graph_particulates(input_data):
 	try:
@@ -328,31 +322,19 @@ def update_graph_particulates(input_data):
 		pm5   = particles.pm_per_1l_air(0.5) - pm100 - pm50 - pm25 - pm10
 		pm3   = particles.pm_per_1l_air(0.3) - pm100 - pm50 - pm25 - pm10 - pm5
 	except:
-		pm5   = None
-		pm3   = None
-	Y_pms_small['values']['0.3 - 0.5 um'].append(pm3)
-	Y_pms_small['values']['0.5 - 1.0 um'].append(pm5)
-	return update_graph(X, Y_pms_small)
-
-@app.callback(Output('graph-particulates-large', 'figure'),
-			  [Input('graph-update', 'n_intervals')])
-def update_graph_particulates(input_data):
-	try:
-		particles = pms5003.read()
-		pm100 = particles.pm_per_1l_air(10.0)
-		pm50  = particles.pm_per_1l_air(5.0) - pm100
-		pm25  = particles.pm_per_1l_air(2.5) - pm100 - pm50
-		pm10  = particles.pm_per_1l_air(1.0) - pm100 - pm50 - pm25
-	except:
 		pm100 = None
 		pm50  = None
 		pm25  = None
 		pm10  = None
+		pm5   = None
+		pm3   = None
+	Y_pms_small['values']['0.3 - 0.5 um'].append(pm3)
+	Y_pms_small['values']['0.5 - 1.0 um'].append(pm5)
 	Y_pms_large['values']['1.0 - 2.5  um'].append(pm10)
 	Y_pms_large['values']['2.5 - 5.0  um'].append(pm25)
 	Y_pms_large['values']['5.0 - 10.0 um'].append(pm50)
 	Y_pms_large['values']['>10.0 um'].append(pm100)
-	return update_graph(X, Y_pms_large)
+	return (update_graph(X, Y_pms_small), update_graph(X, Y_pms_large))
 
 # --------------------------------------------------------------------------------------------------
 # --------------------------------------------------------------------------------------- APP LAUNCH
