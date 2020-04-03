@@ -232,8 +232,8 @@ def update_graph_temperature(input_data):
 	try:
 		factor       = 2.25
 		cpu_temp     = get_cpu_temperature()
-	    raw_temp     = bme280.get_temperature()
-	    value        = raw_temp - ((cpu_temp - raw_temp) / factor)
+		raw_temp     = bme280.get_temperature()
+		value        = raw_temp - ((cpu_temp - raw_temp) / factor)
 	except:
 		value = None
 	Y_temperature['values']['Temperature'].append(value)
